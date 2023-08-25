@@ -6,7 +6,7 @@
 
 #include "Time.h"
 #include "Runtime.h"
-#include "Transform2D.h"
+#include "GameObject2D.h"
 
 namespace pong
 {
@@ -16,11 +16,11 @@ namespace pong
 	class Velocity2D final : public Runtime
 	{
 	private:
-		Transform2D* transform;
+		GameObject2D* gameObject;
 		sf::Vector2f direction;
 
 	public:
-		Velocity2D(Transform2D* transform);
+		Velocity2D(GameObject2D* gameObject);
 		~Velocity2D();
 
 		void setDirection(sf::Vector2f dir);

@@ -1,17 +1,15 @@
 #pragma once
 #include <iostream>
+#include <cmath>
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "Runtime.h"
-#include "Transform2D.h"
 #include "Velocity2D.h"
-#include "GameApp.h"
 
 namespace pong
 {
-	class PongBall : public Transform2D, public Runtime
+	class PongBall final : public GameObject2D, public Runtime
 	{
 	private:
 		Velocity2D* velocityHandler;

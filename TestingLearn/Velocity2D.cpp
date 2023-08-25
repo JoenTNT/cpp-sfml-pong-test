@@ -1,14 +1,14 @@
 #include "Velocity2D.h"
 
-pong::Velocity2D::Velocity2D(Transform2D* transform)
+pong::Velocity2D::Velocity2D(GameObject2D* gameObject)
 {
-	this->transform = transform;
+	this->gameObject = gameObject;
 }
 
 pong::Velocity2D::~Velocity2D()
 {
 	// Release references.
-	transform = nullptr;
+	gameObject = nullptr;
 }
 
 void pong::Velocity2D::setDirection(sf::Vector2f dir)
@@ -33,7 +33,7 @@ void pong::Velocity2D::onAwake()
 void pong::Velocity2D::onUpdate()
 {
 	// Get current position information.
-	sf::Vector2f transformPos = transform->getPosition();
+	sf::Vector2f transformPos = gameObject->getPosition();
 
 	// Calculate velocity after one frame.
 	float deltaTime = pong::Time::getSecondsDelta();
@@ -41,7 +41,7 @@ void pong::Velocity2D::onUpdate()
 	transformPos.y += direction.y * deltaTime;
 
 	// Set updated position information.
-	transform->setPosition(transformPos);
+	gameObject->setPosition(transformPos);
 }
 
 void pong::Velocity2D::onEnd()

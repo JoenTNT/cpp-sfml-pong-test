@@ -24,7 +24,7 @@ pong::GameApp::GameApp()
 	pong::Time::init();
 
 	// Instantiate runtime container.
-	runtimeEntities = std::vector<Runtime*>();
+	runtimeEntities = std::unordered_map<unsigned long long, pong::Runtime*>();
 }
 
 pong::GameApp::~GameApp()
@@ -50,11 +50,18 @@ bool pong::GameApp::isRunning()
 	return isAppRunning;
 }
 
+bool pong::GameApp::isObjectWithIDExists(unsigned long long id)
+{
+	GameApp& app = getInstance();
+	auto it = app.runtimeEntities.find(id);
+	return it != app.runtimeEntities.end();
+}
+
 void pong::GameApp::onAwake()
 {
 	// Add a new ball.
 	pong::PongBall* mainBall = new pong::PongBall(mainWindow, 12.5f);
-	runtimeEntities.push_back(mainBall);
+	runtimeEntities[mainBall->getObjectID()] = mainBall;
 	
 	// Set initial position of the ball to the middle of the window.
 	float ballRadius = mainBall->getRadius();
@@ -69,9 +76,12 @@ void pong::GameApp::onAwake()
 	//sf::Color elapsedColor(0, 0, 0);
 
 	// Call awake for all runtime object.
-	for (Runtime* objPtr : runtimeEntities)
-		objPtr->onAwake();
+	for (const auto& objPtr : runtimeEntities)
+		objPtr.second->onAwake();
 }
+
+sf::Vector2f fWindowSize;
+float ratio;
 
 void pong::GameApp::onUpdate()
 {
@@ -104,19 +114,40 @@ void pong::GameApp::onUpdate()
 			case sf::Event::Resized:
 				// Locked window resize.
 				windowSize = static_cast<sf::Vector2i>(mainWindow->getSize());
-				if (windowSize.x < minWindowWidth || windowSize.x > minWindowWidth)
-					windowSize.x = minWindowWidth;
-				if (windowSize.y < minWindowHeight || windowSize.y > minWindowHeight)
-					windowSize.y = minWindowHeight;
+				if (windowSize.x < minWindowWidth) windowSize.x = minWindowWidth;
+				if (windowSize.y < minWindowHeight) windowSize.y = minWindowHeight;
+
+				// Calculate sync ratio.
+				ratio = (float)minWindowWidth / (float)minWindowHeight;
+				windowSize.y = (int)((float)windowSize.x / ratio);
 
 				// Resetting window and background size.
 				mainWindow->setSize(static_cast<sf::Vector2u>(windowSize));
-				sf::Vector2f fWindowSize = static_cast<sf::Vector2f>(windowSize);
+				fWindowSize = static_cast<sf::Vector2f>(windowSize);
 				background->setSize(fWindowSize);
+				//std::cout << "Resizing... (" << windowSize.x << ", " << windowSize.y << ")" << std::endl;
 
 				// Resize view.
-				mainWindow->setView(sf::View(sf::FloatRect(0.f, 0.f, fWindowSize.x, fWindowSize.y)));
+				//mainWindow->setView(sf::View(sf::FloatRect(0.f, 0.f, fWindowSize.x, fWindowSize.y)));
+				windowSize = static_cast<sf::Vector2i>(mainWindow->getView().getSize());
 				break;
+
+			case sf::Event::KeyPressed:
+				std::cout << "Key Pressed!" << std::endl;
+				break;
+
+			case sf::Event::KeyReleased:
+				std::cout << "Key Released!" << std::endl;
+				break;
+
+			case sf::Event::GainedFocus:
+				std::cout << "Focused!" << std::endl;
+				break;
+
+			case sf::Event::LostFocus:
+				std::cout << "Unfocused!" << std::endl;
+				break;
+
 
 			//case sf::Event::MouseMoved:
 			//	tempSecBeforeChangeBackground -= deltaTime.asSeconds();
@@ -139,29 +170,16 @@ void pong::GameApp::onUpdate()
 			//	}
 			//	break;
 		}
+		//std::cout << "Running Event" << std::endl;
 	}
 
 	//// Set background fill color.
 	//mainWindowBackgroundFill.setFillColor(elapsedColor);
 
 	// Draw all entities.
-	updateEntityIndex = 0;
-	entitySize = static_cast<int>(runtimeEntities.size());
-	while (updateEntityIndex < entitySize) {
-
-		// Check empty object.
-		if (runtimeEntities[updateEntityIndex] == nullptr)
-		{
-			runtimeEntities.erase(runtimeEntities.begin() + updateEntityIndex);
-			entitySize--;
-			continue;
-		}
-
-		// Update an object.
-		runtimeEntities[updateEntityIndex]->onUpdate();
-
-		// Next entity.
-		updateEntityIndex++;
+	for (const auto& objPtr : runtimeEntities) {
+		// Update by one frame.
+		objPtr.second->onUpdate();
 	}
 
 	// Draw new frame.
@@ -171,14 +189,9 @@ void pong::GameApp::onUpdate()
 void pong::GameApp::onEnd()
 {
 	// Cleaning up the runtime entities when the app ended.
-	for (Runtime* objPtr : runtimeEntities) {
-
-		// Call end process for each runtime objects.
-		if (objPtr != nullptr)
-			objPtr->onEnd();
-
+	for (const auto& objPtr : runtimeEntities) {
 		// Delete all objects.
-		delete objPtr;
+		objPtr.second->onEnd();
 	}
 
 	// Clear vector.

@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 #include <cstdlib>
-#include <vector>
+#include <unordered_map>
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -15,12 +15,11 @@ namespace pong
 	{
 	private: // Variables
 		sf::RenderWindow* mainWindow;
-		std::vector<Runtime*> runtimeEntities;
+		std::unordered_map<unsigned long long, Runtime*> runtimeEntities;
 
 		sf::Vector2i windowSize;
 		sf::RectangleShape* background;
 
-		int updateEntityIndex = 0, entitySize;
 		bool isAppRunning = true;
 
 	public: // Variables
@@ -45,6 +44,8 @@ namespace pong
 
 		static sf::Vector2i getWindowSize();
 		bool isRunning();
+
+		static bool isObjectWithIDExists(unsigned long long id);
 
 		void onAwake();
 		void onUpdate();

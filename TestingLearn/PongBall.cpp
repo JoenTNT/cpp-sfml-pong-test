@@ -1,6 +1,6 @@
 #include "PongBall.h"
 
-pong::PongBall::PongBall(sf::RenderWindow* window, float ballRadius) : Transform2D(window)
+pong::PongBall::PongBall(sf::RenderWindow* window, float ballRadius) : GameObject2D(window)
 {
 	// Create shape.
 	shape = sf::CircleShape(ballRadius);
@@ -14,16 +14,19 @@ pong::PongBall::~PongBall()
 	delete velocityHandler;
 }
 
-pong::PongBall::PongBall(pong::PongBall const& ballRef) : Transform2D(ballRef)
+pong::PongBall::PongBall(pong::PongBall const& ballRef) : GameObject2D(ballRef)
 {
 	// Create shape.
-	shape = sf::CircleShape(ballRef.shape.getRadius());
+	shape = sf::CircleShape(ballRef.shape);
+
+	// Add velocity instance.
+	velocityHandler = new Velocity2D(this);
 }
 
 pong::PongBall& pong::PongBall::operator=(pong::PongBall const& ballRef)
 {
 	// Assign information to parent class.
-	Transform2D::operator=(ballRef);
+	pong::GameObject2D::operator=(ballRef);
 
 	// Copy shape information.
 	shape.setRadius(ballRef.shape.getRadius());
@@ -61,87 +64,100 @@ void pong::PongBall::onUpdate()
 	float ballDiameter = getDiameter();
 	sf::Vector2f maxBoundPos = currentPos + sf::Vector2f(ballDiameter, ballDiameter);
 	sf::Vector2f currentVel = velocityHandler->getDirection();
-	sf::Vector2f fWindowSize = static_cast<sf::Vector2f>(pong::GameApp::getWindowSize());
+	sf::Vector2f fWindowSize = getWindow()->getView().getSize();
 	if (maxBoundPos.y > fWindowSize.y || currentPos.y < 0.f) {
+		//std::cout << "Current Y Position = " << currentPos.y << std::endl;
 
 		/* Fixed bounce */
 		/*currentPos.y = currentPos.y < 0.f ? 1.f : fWindowSize.y - ballDiameter - 1.f;
 		maxBoundPos.y = currentPos.y + ballDiameter;*/
 
+		/* Realistic bounce */
+		// Get positive value of shifted position.
+		float shiftedValueY = currentPos.y < 0.f ? -currentPos.y : maxBoundPos.y - fWindowSize.y;
+		currentPos.y = currentPos.y < 0.f ? shiftedValueY : fWindowSize.y - shiftedValueY - ballDiameter;
+
 		/* More Realistic bounce */
-		float shiftedValueY;
-		while (maxBoundPos.y > fWindowSize.y) { // Out of max Window Size.
+		//float shiftedValueY;
+		//while (maxBoundPos.y > fWindowSize.y) { // Out of max Window Size.
 
-			// Get shifted value outside the window, targeting positive value.
-			shiftedValueY = maxBoundPos.y - fWindowSize.y;
+		//	// Get shifted value outside the window, targeting positive value.
+		//	shiftedValueY = maxBoundPos.y - fWindowSize.y;
 
-			// Check if the bound is 2 or more windows out, then reflect it.
-			if (shiftedValueY > fWindowSize.y)
-				shiftedValueY -= fWindowSize.y * (int)(shiftedValueY / fWindowSize.y);
+		//	// Check if the bound is 2 or more windows out, then reflect it.
+		//	if (shiftedValueY > fWindowSize.y)
+		//		shiftedValueY -= fWindowSize.y * (int)(shiftedValueY / fWindowSize.y);
 
-			// Change position after the shift.
-			currentPos.y = fWindowSize.y - (shiftedValueY + ballDiameter);
-			maxBoundPos.y = currentPos.y + ballDiameter;
-		}
-		while (currentPos.y < 0.f) { // Out of min Window Size.
+		//	// Change position after the shift.
+		//	currentPos.y = fWindowSize.y - (shiftedValueY + ballDiameter);
+		//	maxBoundPos.y = currentPos.y + ballDiameter;
+		//}
+		//while (currentPos.y < 0.f) { // Out of min Window Size.
 
-			// Get shifted value outside the window, targeting positive value.
-			shiftedValueY = -currentPos.y;
+		//	// Get shifted value outside the window, targeting positive value.
+		//	shiftedValueY = -currentPos.y;
 
-			// Check if the bound is 2 or more windows out, then reflect it.
-			if (shiftedValueY > fWindowSize.y)
-				shiftedValueY -= fWindowSize.y * (int)(shiftedValueY / fWindowSize.y);
+		//	// Check if the bound is 2 or more windows out, then reflect it.
+		//	if (shiftedValueY > fWindowSize.y)
+		//		shiftedValueY -= fWindowSize.y * (int)(shiftedValueY / fWindowSize.y);
 
-			// Change position after the shift.
-			currentPos.y = shiftedValueY;
-		}
+		//	// Change position after the shift.
+		//	currentPos.y = shiftedValueY;
+		//}
 
 		// Change velocity y by negating it.
 		currentVel = sf::Vector2f(currentVel.x, -currentVel.y);
-		std::cout << "Velocity Changed! Current Position = (" << currentPos.x << ", " << currentPos.y
-			<< ")" << std::endl;
+		/*std::cout << "Velocity Changed! Current Position = (" << currentPos.x << ", " << currentPos.y
+			<< ")" << std::endl;*/
 	}
 	if (maxBoundPos.x > fWindowSize.x || currentPos.x < 0.f) {
+		//std::cout << "Current X Position = " << currentPos.x << std::endl;
 
 		/* Fixed bounce */
-		/*currentPos.x = currentPos.x < 0.f ? 1.f : fWindowSize.x - ballDiameter - 1.f;
+		/*currentPos.x = (currentPos.x < 0.f ? 1.f : fWindowSize.x - ballDiameter - 1.f);
 		maxBoundPos.x = currentPos.x + ballDiameter;*/
 
+		/* Realistic bounce */
+		// Get positive value of shifted position.
+		float shiftedValueX = currentPos.x < 0.f ? -currentPos.x : maxBoundPos.x - fWindowSize.x;
+		currentPos.x = currentPos.x < 0.f ? shiftedValueX : fWindowSize.x - shiftedValueX - ballDiameter;
+
 		/* More Realistic bounce */
-		float shiftedValueX;
-		while (maxBoundPos.x > fWindowSize.x) { // Out of max Window Size.
+		//float shiftedValueX;
+		//while (maxBoundPos.x > fWindowSize.x) { // Out of max Window Size.
 
-			// Get shifted value outside the window, targeting positive value.
-			shiftedValueX = maxBoundPos.x - fWindowSize.x;
+		//	// Get shifted value outside the window, targeting positive value.
+		//	shiftedValueX = maxBoundPos.x - fWindowSize.x;
 
-			// Check if the bound is 2 or more windows out, then reflect it.
-			if (shiftedValueX > fWindowSize.x)
-				shiftedValueX -= fWindowSize.x * (int)(shiftedValueX / fWindowSize.x);
+		//	// Check if the bound is 2 or more windows out, then reflect it.
+		//	if (shiftedValueX > fWindowSize.x)
+		//		shiftedValueX -= fWindowSize.x * (int)(shiftedValueX / fWindowSize.x);
 
-			// Change position after the shift.
-			currentPos.x = fWindowSize.x - (shiftedValueX + ballDiameter);
-			maxBoundPos.x = currentPos.x + ballDiameter;
-		}
-		while (currentPos.x < 0.f) { // Out of min Window Size.
+		//	// Change position after the shift.
+		//	currentPos.x = fWindowSize.x - (shiftedValueX + ballDiameter);
+		//	maxBoundPos.x = currentPos.x + ballDiameter;
+		//}
+		//while (currentPos.x < 0.f) { // Out of min Window Size.
 
-			// Get shifted value outside the window, targeting positive value.
-			shiftedValueX = -currentPos.x;
+		//	// Get shifted value outside the window, targeting positive value.
+		//	shiftedValueX = -currentPos.x;
 
-			// Check if the bound is 2 or more windows out, then reflect it.
-			if (shiftedValueX > fWindowSize.x)
-				shiftedValueX -= fWindowSize.x * (int)(shiftedValueX / fWindowSize.x);
+		//	// Check if the bound is 2 or more windows out, then reflect it.
+		//	if (shiftedValueX > fWindowSize.x)
+		//		shiftedValueX -= fWindowSize.x * (int)(shiftedValueX / fWindowSize.x);
 
-			// Change position after the shift.
-			currentPos.x = shiftedValueX;
-		}
+		//	// Change position after the shift.
+		//	currentPos.x = shiftedValueX;
+		//}
 
 		// Change velocity y by negating it.
 		currentVel = sf::Vector2f(-currentVel.x, currentVel.y);
-		std::cout << "Velocity Changed! Current Position = (" << currentPos.x << ", " << currentPos.y
-			<< ")" << std::endl;
+		/*std::cout << "Velocity Changed! Current Position = (" << currentPos.x << ", " << currentPos.y
+			<< ")" << std::endl;*/
 	}
 
-	// Update changed velocity.
+	// Update changed position and velocity.
+	setPosition(currentPos);
 	velocityHandler->setDirection(currentVel);
 
 	// Set ball sprite position.

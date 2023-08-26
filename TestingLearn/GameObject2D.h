@@ -5,7 +5,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "GameApp.h"
+#include "RuntimeContainer.h"
 
 namespace pong
 {
@@ -15,13 +15,13 @@ namespace pong
 		sf::RenderWindow* window;
 		sf::Vector2f position;
 
-		unsigned long long objectID = 0ULL;
+		unsigned long objectID = 0UL;
 
 		/// <summary>
 		/// Generate random ULL for object Id.
 		/// </summary>
 		/// <returns>Object ID</returns>
-		static unsigned long long getRandomID();
+		static unsigned long getRandomID();
 
 	protected:
 		sf::RenderWindow* getWindow();
@@ -37,7 +37,7 @@ namespace pong
 		void setPosition(float x, float y);
 		sf::Vector2f getPosition();
 
-		unsigned long long getObjectID();
+		unsigned long getObjectID();
 
 		/// <summary>
 		/// Draw a shape to target window.

@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <chrono>
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -13,24 +14,26 @@ namespace pong
 	{
 	private:
 		sf::Clock clock;
-		sf::Time deltaTime;
+		sf::Time time;
+		float fixedDeltaTime = 1.f / 60.f;
+		float t = 0.f;
 
-	private:
 		Time();
-		~Time();
-
+		
 		/// <summary>
 		/// Singleton implementation.
 		/// </summary>
 		/// <returns>Singleton instance.</returns>
 		static Time& getInstance();
 
+		~Time();
 		Time(Time const&) = delete;
 		void operator=(Time const&) = delete;
 
 	public:
-		static void init();
-		static float getSecondsDelta();
+		static float getFixedDelta();
+		static void setFixedDelta(float fixedDeltaTime);
+		static float getElapsedDelta();
 		static void tick();
 	};
 }

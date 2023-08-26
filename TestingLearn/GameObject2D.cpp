@@ -12,6 +12,9 @@ pong::GameObject2D::GameObject2D(sf::RenderWindow* window)
 
 	// Generate object ID.
 	objectID = getRandomID();
+
+	// Debuging.
+	std::cout << "[DEBUG] Object generated with ID: " << objectID << std::endl;
 }
 
 pong::GameObject2D::~GameObject2D()
@@ -55,7 +58,7 @@ sf::Vector2f pong::GameObject2D::getPosition()
 	return position;
 }
 
-unsigned long long pong::GameObject2D::getObjectID()
+unsigned long pong::GameObject2D::getObjectID()
 {
 	return objectID;
 }
@@ -65,19 +68,19 @@ void pong::GameObject2D::onWindowDraw(sf::Shape* shape)
 	window->draw(*shape);
 }
 
-unsigned long long pong::GameObject2D::getRandomID()
+unsigned long pong::GameObject2D::getRandomID()
 {
 	// Create random device.
 	std::random_device rd;
-	std::mt19937 generator(rd);
-	std::uniform_int_distribution<unsigned long long> distribution(0ULL,
-		std::numeric_limits<unsigned long long>::max());
+	std::mt19937_64 gen(rd());
+	std::uniform_int_distribution<unsigned long> distrib(0UL,
+		std::numeric_limits<unsigned long>::max());
 
 	// Check if ID already exists.
-	unsigned long long tempID;
+	unsigned long tempID;
 	do {
-		tempID = distribution(generator);
-	} while (pong::GameApp::isObjectWithIDExists(tempID));
+		tempID = distrib(gen);
+	} while (pong::RuntimeContainer::isIDExists(tempID));
 
 	// Return generated random ID.
 	return tempID;

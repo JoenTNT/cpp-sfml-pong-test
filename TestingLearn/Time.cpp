@@ -2,7 +2,7 @@
 
 pong::Time::Time()
 {
-    // Create a clock.
+    // Initialize clock.
     clock = sf::Clock();
 }
 
@@ -17,18 +17,32 @@ pong::Time& pong::Time::getInstance()
     return instance;
 }
 
-void pong::Time::init()
+float pong::Time::getFixedDelta()
 {
-    getInstance().clock.restart();
+    return getInstance().fixedDeltaTime;
 }
 
-float pong::Time::getSecondsDelta()
+void pong::Time::setFixedDelta(float fixedDeltaTime)
 {
-    return getInstance().deltaTime.asSeconds();
+    getInstance().fixedDeltaTime = fixedDeltaTime;
+}
+
+float pong::Time::getElapsedDelta()
+{
+    return getInstance().t;
 }
 
 void pong::Time::tick()
 {
-    getInstance().deltaTime = getInstance().clock.restart();
+    // Get only instance.
+    auto& time = getInstance();
+
+    // Add tick time with delta time.
+    time.t += time.fixedDeltaTime;
+
+    // TODO: Create realistic tick.
+    /*std::cout << "Elapsed: " << time.clock.getElapsedTime().asSeconds();
+    time.time = time.clock.restart();
+    std::cout << "; Delta Time: " << time.time.asSeconds() << std::endl;*/
 }
 

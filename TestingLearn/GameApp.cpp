@@ -14,17 +14,13 @@ pong::GameApp::GameApp()
 	// Create main window.
 	windowSize = sf::Vector2i(minWindowWidth, minWindowHeight);
 	mainWindow = new sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), "PONG!");
+	mainWindow->setFramerateLimit(60);
+	mainWindow->setVerticalSyncEnabled(true);
 
 	// Create main background of main window
-	windowColor = sf::Color(24, 56, 120); // Start with black.
+	windowColor = sf::Color(0, 0, 0); // Start with black.
 	background = new sf::RectangleShape(static_cast<sf::Vector2f>(windowSize));
 	background->setFillColor(windowColor);
-
-	// Init in game time.
-	pong::Time::init();
-
-	// Instantiate runtime container.
-	runtimeEntities = std::unordered_map<unsigned long long, pong::Runtime*>();
 }
 
 pong::GameApp::~GameApp()
@@ -50,18 +46,11 @@ bool pong::GameApp::isRunning()
 	return isAppRunning;
 }
 
-bool pong::GameApp::isObjectWithIDExists(unsigned long long id)
-{
-	GameApp& app = getInstance();
-	auto it = app.runtimeEntities.find(id);
-	return it != app.runtimeEntities.end();
-}
-
 void pong::GameApp::onAwake()
 {
 	// Add a new ball.
 	pong::PongBall* mainBall = new pong::PongBall(mainWindow, 12.5f);
-	runtimeEntities[mainBall->getObjectID()] = mainBall;
+	pong::RuntimeContainer::addRutime(mainBall->getObjectID(), mainBall);
 	
 	// Set initial position of the ball to the middle of the window.
 	float ballRadius = mainBall->getRadius();
@@ -69,15 +58,37 @@ void pong::GameApp::onAwake()
 		- sf::Vector2f(ballRadius, ballRadius));
 
 	// Temp: Set Ball Velocity on start.
-	mainBall->getVelocity()->setDirection(sf::Vector2f(785.5f, 125.5f));
+	//mainBall->getVelocity()->setDirection(sf::Vector2f(785.5f, 125.5f));
+
+	// Create player 1.
+	pong::PongPaddle* p1 = new pong::PongPaddle(mainWindow, sf::Vector2f(20.f, 60.f));
+	pong::RuntimeContainer::addRutime(p1->getObjectID(), p1);
+	p1->setPosition(sf::Vector2f((float)windowSize.x / 8.f,
+		((float)windowSize.y - p1->getHeight()) / 2.f));
+	p1->setControlKeys(sf::Keyboard::Key::W, sf::Keyboard::Key::S);
+
+	// Create player 2.
+	pong::PongPaddle* p2 = new pong::PongPaddle(mainWindow, sf::Vector2f(20.f, 60.f));
+	pong::RuntimeContainer::addRutime(p2->getObjectID(), p2);
+	p2->setPosition(sf::Vector2f((float)windowSize.x * 7.f / 8.f - (p2->getWidth() / 2.f),
+		((float)windowSize.y - p2->getHeight()) / 2.f));
+	p2->setControlKeys(sf::Keyboard::Key::Up, sf::Keyboard::Key::Down);
+
+	// TEMP: Create UI Score text.
+	if (!font.loadFromFile("Minecraft.ttf")) {
+		throw std::runtime_error("[ERROR] Target font not found!");
+	}
+	scoreText = sf::Text("0", font, 36u);
+	scoreText.setFillColor(sf::Color::White);
+	scoreText.setPosition(sf::Vector2f(((float)windowSize.x
+		- scoreText.getLocalBounds().width) / 2.f, 18.f));
+
+	// Run awake method.
+	pong::RuntimeContainer::awake();
 
 	//float tempSecBeforeChangeBackground = changeBackgroundElapse, lerpPercent;
 	//sf::Color nextColor = sf::Color(std::rand() % 256, std::rand() % 256, std::rand() % 256);
 	//sf::Color elapsedColor(0, 0, 0);
-
-	// Call awake for all runtime object.
-	for (const auto& objPtr : runtimeEntities)
-		objPtr.second->onAwake();
 }
 
 sf::Vector2f fWindowSize;
@@ -86,8 +97,10 @@ float ratio;
 void pong::GameApp::onUpdate()
 {
 	// Check termination of the app.
-	if (!mainWindow->isOpen())
-		isAppRunning = false;
+	if (!mainWindow->isOpen()) isAppRunning = false;
+
+	// Check if game app is currently focused, if not then do not run the update.
+	if (!mainWindow->hasFocus()) return;
 
 	// Update delta time.
 	pong::Time::tick();
@@ -132,23 +145,6 @@ void pong::GameApp::onUpdate()
 				windowSize = static_cast<sf::Vector2i>(mainWindow->getView().getSize());
 				break;
 
-			case sf::Event::KeyPressed:
-				std::cout << "Key Pressed!" << std::endl;
-				break;
-
-			case sf::Event::KeyReleased:
-				std::cout << "Key Released!" << std::endl;
-				break;
-
-			case sf::Event::GainedFocus:
-				std::cout << "Focused!" << std::endl;
-				break;
-
-			case sf::Event::LostFocus:
-				std::cout << "Unfocused!" << std::endl;
-				break;
-
-
 			//case sf::Event::MouseMoved:
 			//	tempSecBeforeChangeBackground -= deltaTime.asSeconds();
 			//	lerpPercent = 1.f - tempSecBeforeChangeBackground / changeBackgroundElapse;
@@ -176,11 +172,9 @@ void pong::GameApp::onUpdate()
 	//// Set background fill color.
 	//mainWindowBackgroundFill.setFillColor(elapsedColor);
 
-	// Draw all entities.
-	for (const auto& objPtr : runtimeEntities) {
-		// Update by one frame.
-		objPtr.second->onUpdate();
-	}
+	// Runtime update all runtime.
+	pong::RuntimeContainer::update();
+	mainWindow->draw(scoreText);
 
 	// Draw new frame.
 	mainWindow->display();
@@ -188,12 +182,5 @@ void pong::GameApp::onUpdate()
 
 void pong::GameApp::onEnd()
 {
-	// Cleaning up the runtime entities when the app ended.
-	for (const auto& objPtr : runtimeEntities) {
-		// Delete all objects.
-		objPtr.second->onEnd();
-	}
-
-	// Clear vector.
-	runtimeEntities.clear();
+	pong::RuntimeContainer::end();
 }

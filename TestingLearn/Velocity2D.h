@@ -5,7 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Time.h"
-#include "Runtime.h"
+//#include "Runtime.h"
 #include "GameObject2D.h"
 
 namespace pong

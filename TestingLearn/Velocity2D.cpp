@@ -40,7 +40,7 @@ void pong::Velocity2D::onUpdate()
 	sf::Vector2f transformPos = gameObject->getPosition();
 
 	// Calculate velocity after one frame.
-	float deltaTime = pong::Time::getSecondsDelta();
+	float deltaTime = pong::Time::getFixedDelta();
 	transformPos.x += direction.x * deltaTime;
 	transformPos.y += direction.y * deltaTime;
 

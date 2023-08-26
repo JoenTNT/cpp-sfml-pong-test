@@ -7,7 +7,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "PongBall.h"
-#include "Time.h"
+#include "PongPaddle.h"
 
 namespace pong
 {
@@ -15,10 +15,12 @@ namespace pong
 	{
 	private: // Variables
 		sf::RenderWindow* mainWindow;
-		std::unordered_map<unsigned long long, Runtime*> runtimeEntities;
-
+		
 		sf::Vector2i windowSize;
 		sf::RectangleShape* background;
+
+		sf::Text scoreText;
+		sf::Font font;
 
 		bool isAppRunning = true;
 
@@ -32,6 +34,9 @@ namespace pong
 		GameApp();
 		~GameApp();
 
+		GameApp(GameApp const&) = delete;
+		void operator=(GameApp const&) = delete;
+
 	public: // Functions
 		/// <summary>
 		/// Singleton implementation.
@@ -39,13 +44,8 @@ namespace pong
 		/// <returns>Singleton instance.</returns>
 		static GameApp& getInstance();
 
-		GameApp(GameApp const&) = delete;
-		void operator=(GameApp const&) = delete;
-
 		static sf::Vector2i getWindowSize();
 		bool isRunning();
-
-		static bool isObjectWithIDExists(unsigned long long id);
 
 		void onAwake();
 		void onUpdate();

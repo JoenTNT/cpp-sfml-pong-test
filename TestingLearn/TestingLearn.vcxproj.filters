@@ -24,9 +24,6 @@
     <ClCompile Include="GameApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Velocity2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Runtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -39,15 +36,21 @@
     <ClCompile Include="GameObject2D.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Velocity2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RuntimeContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PongBall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GameApp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Velocity2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Runtime.h">
@@ -62,5 +65,19 @@
     <ClInclude Include="GameObject2D.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Velocity2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RuntimeContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GameSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Minecraft.ttf">
+      <Filter>Source Files</Filter>
+    </Font>
   </ItemGroup>
 </Project>

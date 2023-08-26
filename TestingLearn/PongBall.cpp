@@ -4,6 +4,7 @@ pong::PongBall::PongBall(sf::RenderWindow* window, float ballRadius) : GameObjec
 {
 	// Create shape.
 	shape = sf::CircleShape(ballRadius);
+	shape.setFillColor(sf::Color::White);
 
 	// Add velocity instance.
 	velocityHandler = new Velocity2D(this);

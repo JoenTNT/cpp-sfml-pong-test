@@ -46,4 +46,3 @@ namespace pong
 		void onWindowDraw(sf::Shape* shape);
 	};
 }
-

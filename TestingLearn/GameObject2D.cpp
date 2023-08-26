@@ -20,7 +20,7 @@ pong::GameObject2D::~GameObject2D()
 	window = nullptr;
 }
 
-pong::GameObject2D::GameObject2D(pong::GameObject2D const& objRef)
+pong::GameObject2D::GameObject2D(GameObject2D const& objRef)
 	: window(objRef.window)
 	, position(objRef.position)
 {
@@ -28,7 +28,7 @@ pong::GameObject2D::GameObject2D(pong::GameObject2D const& objRef)
 	objectID = getRandomID();
 }
 
-pong::GameObject2D& pong::GameObject2D::operator=(pong::GameObject2D const& objRef)
+pong::GameObject2D& pong::GameObject2D::operator=(GameObject2D const& objRef)
 {
 	// Assign with same reference.
 	window = objRef.window;

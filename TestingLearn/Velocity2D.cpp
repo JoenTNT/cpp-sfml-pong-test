@@ -2,7 +2,11 @@
 
 pong::Velocity2D::Velocity2D(GameObject2D* gameObject)
 {
+	// Assign game object reference.
 	this->gameObject = gameObject;
+
+	// Set initial direction.
+	direction = sf::Vector2f(0.f, 0.f);
 }
 
 pong::Velocity2D::~Velocity2D()

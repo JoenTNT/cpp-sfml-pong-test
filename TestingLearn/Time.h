@@ -4,8 +4,6 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "Runtime.h"
-
 namespace pong
 {
 	/// <summary>

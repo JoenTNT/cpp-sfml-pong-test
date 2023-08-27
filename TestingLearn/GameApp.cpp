@@ -50,7 +50,7 @@ void pong::GameApp::onAwake()
 {
 	// Add a new ball.
 	pong::PongBall* mainBall = new pong::PongBall(mainWindow, 12.5f);
-	pong::RuntimeContainer::addRutime(mainBall->getObjectID(), mainBall);
+	pong::RuntimeContainer::addRuntime(mainBall->getObjectID(), mainBall);
 	
 	// Set initial position of the ball to the middle of the window.
 	float ballRadius = mainBall->getRadius();
@@ -62,14 +62,14 @@ void pong::GameApp::onAwake()
 
 	// Create player 1.
 	pong::PongPaddle* p1 = new pong::PongPaddle(mainWindow, sf::Vector2f(20.f, 60.f));
-	pong::RuntimeContainer::addRutime(p1->getObjectID(), p1);
+	pong::RuntimeContainer::addRuntime(p1->getObjectID(), p1);
 	p1->setPosition(sf::Vector2f((float)windowSize.x / 8.f,
 		((float)windowSize.y - p1->getHeight()) / 2.f));
 	p1->setControlKeys(sf::Keyboard::Key::W, sf::Keyboard::Key::S);
 
 	// Create player 2.
 	pong::PongPaddle* p2 = new pong::PongPaddle(mainWindow, sf::Vector2f(20.f, 60.f));
-	pong::RuntimeContainer::addRutime(p2->getObjectID(), p2);
+	pong::RuntimeContainer::addRuntime(p2->getObjectID(), p2);
 	p2->setPosition(sf::Vector2f((float)windowSize.x * 7.f / 8.f - (p2->getWidth() / 2.f),
 		((float)windowSize.y - p2->getHeight()) / 2.f));
 	p2->setControlKeys(sf::Keyboard::Key::Up, sf::Keyboard::Key::Down);

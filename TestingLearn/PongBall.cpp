@@ -36,11 +36,6 @@ pong::PongBall& pong::PongBall::operator=(pong::PongBall const& ballRef)
 	return *this;
 }
 
-pong::Velocity2D* pong::PongBall::getVelocity()
-{
-	return velocityHandler;
-}
-
 float pong::PongBall::getRadius()
 {
 	return shape.getRadius();
@@ -49,6 +44,42 @@ float pong::PongBall::getRadius()
 float pong::PongBall::getDiameter()
 {
 	return getRadius() * 2.f;
+}
+
+void pong::PongBall::setSpeed(float speed)
+{
+	moveSpeed = speed;
+}
+
+float pong::PongBall::getSpeed()
+{
+	return moveSpeed;
+}
+
+void pong::PongBall::setAccelerate(float accelerate)
+{
+	accelerateSpeed = accelerate;
+}
+
+float pong::PongBall::getAccelerate()
+{
+	return accelerateSpeed;
+}
+
+void pong::PongBall::bounceX()
+{
+	// Change velocity x by negating it.
+	sf::Vector2f currentVel = velocityHandler->getDirection();
+	currentVel.x = -currentVel.x;
+	velocityHandler->setDirection(currentVel);
+}
+
+void pong::PongBall::bounceY()
+{
+	// Change velocity y by negating it.
+	sf::Vector2f currentVel = velocityHandler->getDirection();
+	currentVel.y = -currentVel.y;
+	velocityHandler->setDirection(currentVel);
 }
 
 void pong::PongBall::onAwake()
@@ -78,38 +109,8 @@ void pong::PongBall::onUpdate()
 		float shiftedValueY = currentPos.y < 0.f ? -currentPos.y : maxBoundPos.y - fWindowSize.y;
 		currentPos.y = currentPos.y < 0.f ? shiftedValueY : fWindowSize.y - shiftedValueY - ballDiameter;
 
-		/* More Realistic bounce */
-		//float shiftedValueY;
-		//while (maxBoundPos.y > fWindowSize.y) { // Out of max Window Size.
-
-		//	// Get shifted value outside the window, targeting positive value.
-		//	shiftedValueY = maxBoundPos.y - fWindowSize.y;
-
-		//	// Check if the bound is 2 or more windows out, then reflect it.
-		//	if (shiftedValueY > fWindowSize.y)
-		//		shiftedValueY -= fWindowSize.y * (int)(shiftedValueY / fWindowSize.y);
-
-		//	// Change position after the shift.
-		//	currentPos.y = fWindowSize.y - (shiftedValueY + ballDiameter);
-		//	maxBoundPos.y = currentPos.y + ballDiameter;
-		//}
-		//while (currentPos.y < 0.f) { // Out of min Window Size.
-
-		//	// Get shifted value outside the window, targeting positive value.
-		//	shiftedValueY = -currentPos.y;
-
-		//	// Check if the bound is 2 or more windows out, then reflect it.
-		//	if (shiftedValueY > fWindowSize.y)
-		//		shiftedValueY -= fWindowSize.y * (int)(shiftedValueY / fWindowSize.y);
-
-		//	// Change position after the shift.
-		//	currentPos.y = shiftedValueY;
-		//}
-
-		// Change velocity y by negating it.
-		currentVel = sf::Vector2f(currentVel.x, -currentVel.y);
-		/*std::cout << "Velocity Changed! Current Position = (" << currentPos.x << ", " << currentPos.y
-			<< ")" << std::endl;*/
+		// Bounce the pong ball.
+		bounceY();
 	}
 	if (maxBoundPos.x > fWindowSize.x || currentPos.x < 0.f) {
 		//std::cout << "Current X Position = " << currentPos.x << std::endl;
@@ -123,43 +124,12 @@ void pong::PongBall::onUpdate()
 		float shiftedValueX = currentPos.x < 0.f ? -currentPos.x : maxBoundPos.x - fWindowSize.x;
 		currentPos.x = currentPos.x < 0.f ? shiftedValueX : fWindowSize.x - shiftedValueX - ballDiameter;
 
-		/* More Realistic bounce */
-		//float shiftedValueX;
-		//while (maxBoundPos.x > fWindowSize.x) { // Out of max Window Size.
-
-		//	// Get shifted value outside the window, targeting positive value.
-		//	shiftedValueX = maxBoundPos.x - fWindowSize.x;
-
-		//	// Check if the bound is 2 or more windows out, then reflect it.
-		//	if (shiftedValueX > fWindowSize.x)
-		//		shiftedValueX -= fWindowSize.x * (int)(shiftedValueX / fWindowSize.x);
-
-		//	// Change position after the shift.
-		//	currentPos.x = fWindowSize.x - (shiftedValueX + ballDiameter);
-		//	maxBoundPos.x = currentPos.x + ballDiameter;
-		//}
-		//while (currentPos.x < 0.f) { // Out of min Window Size.
-
-		//	// Get shifted value outside the window, targeting positive value.
-		//	shiftedValueX = -currentPos.x;
-
-		//	// Check if the bound is 2 or more windows out, then reflect it.
-		//	if (shiftedValueX > fWindowSize.x)
-		//		shiftedValueX -= fWindowSize.x * (int)(shiftedValueX / fWindowSize.x);
-
-		//	// Change position after the shift.
-		//	currentPos.x = shiftedValueX;
-		//}
-
-		// Change velocity y by negating it.
-		currentVel = sf::Vector2f(-currentVel.x, currentVel.y);
-		/*std::cout << "Velocity Changed! Current Position = (" << currentPos.x << ", " << currentPos.y
-			<< ")" << std::endl;*/
+		// Bounce the pong ball.
+		bounceX();
 	}
 
 	// Update changed position and velocity.
 	setPosition(currentPos);
-	velocityHandler->setDirection(currentVel);
 
 	// Set ball sprite position.
 	shape.setPosition(currentPos);

@@ -17,8 +17,8 @@ namespace pong
 		Velocity2D* velocityHandler;
 		sf::CircleShape shape;
 
-	public:
-		float moveSpeed = 5.f;
+		float moveSpeed = 0.f;
+		float accelerateSpeed = 2.f;
 
 	public:
 		PongBall(sf::RenderWindow* window, float ballRadius);
@@ -27,9 +27,23 @@ namespace pong
 		PongBall(PongBall const& ballRef);
 		PongBall& operator=(PongBall const& ballRef);
 
-		Velocity2D* getVelocity();
 		float getRadius();
 		float getDiameter();
+
+		void setSpeed(float speed);
+		float getSpeed();
+		void setAccelerate(float accelerate);
+		float getAccelerate();
+
+		/// <summary>
+		/// Bounce function against something on x axis.
+		/// </summary>
+		void bounceX();
+
+		/// <summary>
+		/// Bounce function against something on y axis.
+		/// </summary>
+		void bounceY();
 
 		void onAwake();
 		void onUpdate();

@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <functional>
 #include <cmath>
 
 #include <SFML/System.hpp>
@@ -7,13 +8,15 @@
 
 //#include "Runtime.h"
 //#include "GameObject2D.h"
-#include "Velocity2D.h"
+//#include "Velocity2D.h"
+#include "PongBall.h"
 
 namespace pong
 {
 	class PongPaddle final : public GameObject2D, public Runtime
 	{
 	private:
+		std::unordered_map<unsigned long, PongBall*> ballsOnMap;
 		Velocity2D* velocityHandler;
 		sf::RectangleShape shape;
 
@@ -24,6 +27,9 @@ namespace pong
 
 		bool isUpKeyPressed = false;
 		bool isDownKeyPressed = false;
+
+		void checkBall(PongBall* ball);
+		void listenOnAddRuntime(unsigned long id, Runtime* runtimeObj);
 
 	public:
 		PongPaddle(sf::RenderWindow* window, sf::Vector2f paddleSize);

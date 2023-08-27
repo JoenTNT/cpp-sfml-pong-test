@@ -1,5 +1,18 @@
 #include "PongPaddle.h"
 
+void pong::PongPaddle::checkBall(PongBall* ball)
+{
+
+}
+
+void pong::PongPaddle::listenOnAddRuntime(unsigned long id, Runtime* runtimeObj)
+{
+	PongBall* ball = dynamic_cast<PongBall*>(runtimeObj);
+	if (ball) {
+		std::cout << "Found Ball!" << std::endl;
+	}
+}
+
 pong::PongPaddle::PongPaddle(sf::RenderWindow* window, sf::Vector2f paddleSize) : GameObject2D(window)
 {
 	//// Create velocity object.
@@ -8,6 +21,7 @@ pong::PongPaddle::PongPaddle(sf::RenderWindow* window, sf::Vector2f paddleSize) 
 
 	// Create paddle shape.
 	shape = sf::RectangleShape(paddleSize);
+	ballsOnMap = std::unordered_map<unsigned long, pong::PongBall*>();
 }
 
 pong::PongPaddle::PongPaddle(sf::RenderWindow* window, float sizeX, float sizeY) : GameObject2D(window)
@@ -75,6 +89,14 @@ float pong::PongPaddle::getHeight()
 
 void pong::PongPaddle::onAwake()
 {
+	// Subscribe events.
+	/*auto binder = std::bind(&listenOnAddRuntime, this, std::placeholders::_1, std::placeholders::_2);
+	auto func = [this](unsigned long, Runtime*) {
+
+	};
+	pong::RuntimeContainer::subsOnAddRuntime([](unsigned long, Runtime*) {
+		;
+	});*/
 }
 
 void pong::PongPaddle::onUpdate()
@@ -102,6 +124,10 @@ void pong::PongPaddle::onUpdate()
 
 	// Set sprite position.
 	shape.setPosition(getPosition());
+
+	// Check if a ball hits the paddle.
+	RuntimeContainer::getRuntimeObjects(&ballsOnMap);
+	for (auto& ball : ballsOnMap) checkBall(ball.second);
 
 	// Draw the paddle.
 	onWindowDraw(&shape);

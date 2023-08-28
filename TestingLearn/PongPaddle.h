@@ -2,6 +2,7 @@
 #include <iostream>
 #include <functional>
 #include <cmath>
+#include <unordered_set>
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -13,12 +14,15 @@
 
 namespace pong
 {
-	class PongPaddle final : public GameObject2D, public Runtime
+	class PongPaddle final : public GameObject2D, public IRuntime
 	{
 	private:
 		std::unordered_map<unsigned long, PongBall*> ballsOnMap;
+		std::unordered_set<unsigned long> ballInsidePaddle;
 		Velocity2D* velocityHandler;
 		sf::RectangleShape shape;
+
+		Subscriber* onAddRuntimeEvSubs;
 
 		float moveSpeed = 192.f;
 
@@ -28,8 +32,14 @@ namespace pong
 		bool isUpKeyPressed = false;
 		bool isDownKeyPressed = false;
 
+		bool bounceLeft = true; // Bounce from right to left movement.
+		bool bounceRight = false; // Bounce from left to right movement.
+
 		void checkBall(PongBall* ball);
-		void listenOnAddRuntime(unsigned long id, Runtime* runtimeObj);
+		bool isBallOnYHit(sf::Vector2f ballPos, sf::Vector2f paddlePos, float ballDiameter, 
+			float paddleHeight);
+
+		std::function<void(const OnAddRuntimeEventArgs&)> onAddRuntimeFunc;
 
 	public:
 		PongPaddle(sf::RenderWindow* window, sf::Vector2f paddleSize);
@@ -44,9 +54,16 @@ namespace pong
 		void setMoveSpeed(float moveSpeed);
 		float getMoveSpeed();
 
+		/// <summary>
+		/// Get paddle size.
+		/// </summary>
+		/// <returns>Width and height of paddle.</returns>
 		sf::Vector2f getSize();
 		float getWidth();
 		float getHeight();
+
+		void setBounceLeft();
+		void setBounceRight();
 
 		void onAwake();
 		void onUpdate();

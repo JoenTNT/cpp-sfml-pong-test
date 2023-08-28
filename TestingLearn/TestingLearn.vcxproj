@@ -158,18 +158,18 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PongBall.cpp" />
     <ClCompile Include="PongPaddle.cpp" />
-    <ClCompile Include="Runtime.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Velocity2D.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Events\EventSystem.h" />
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GameObject2D.h" />
     <ClInclude Include="GameSystem.h" />
     <ClInclude Include="RuntimeContainer.h" />
     <ClInclude Include="PongBall.h" />
     <ClInclude Include="PongPaddle.h" />
-    <ClInclude Include="Runtime.h" />
+    <ClInclude Include="Systems\IRuntime.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Velocity2D.h" />
   </ItemGroup>

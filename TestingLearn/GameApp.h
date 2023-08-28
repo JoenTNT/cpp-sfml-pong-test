@@ -6,12 +6,12 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "PongBall.h"
+//#include "PongBall.h"
 #include "PongPaddle.h"
 
 namespace pong
 {
-	class GameApp final : public Runtime
+	class GameApp final : public IRuntime
 	{
 	private: // Variables
 		sf::RenderWindow* mainWindow;

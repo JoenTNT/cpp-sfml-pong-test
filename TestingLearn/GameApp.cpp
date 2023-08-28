@@ -48,17 +48,14 @@ bool pong::GameApp::isRunning()
 
 void pong::GameApp::onAwake()
 {
-	// Add a new ball.
+	// TEMP: Add a new ball before event subcription.
 	pong::PongBall* mainBall = new pong::PongBall(mainWindow, 12.5f);
 	pong::RuntimeContainer::addRuntime(mainBall->getObjectID(), mainBall);
-	
+
 	// Set initial position of the ball to the middle of the window.
 	float ballRadius = mainBall->getRadius();
 	mainBall->setPosition((static_cast<sf::Vector2f>(windowSize) / 2.f)
 		- sf::Vector2f(ballRadius, ballRadius));
-
-	// Temp: Set Ball Velocity on start.
-	//mainBall->getVelocity()->setDirection(sf::Vector2f(785.5f, 125.5f));
 
 	// Create player 1.
 	pong::PongPaddle* p1 = new pong::PongPaddle(mainWindow, sf::Vector2f(20.f, 60.f));
@@ -66,6 +63,7 @@ void pong::GameApp::onAwake()
 	p1->setPosition(sf::Vector2f((float)windowSize.x / 8.f,
 		((float)windowSize.y - p1->getHeight()) / 2.f));
 	p1->setControlKeys(sf::Keyboard::Key::W, sf::Keyboard::Key::S);
+	p1->setBounceRight();
 
 	// Create player 2.
 	pong::PongPaddle* p2 = new pong::PongPaddle(mainWindow, sf::Vector2f(20.f, 60.f));
@@ -73,6 +71,7 @@ void pong::GameApp::onAwake()
 	p2->setPosition(sf::Vector2f((float)windowSize.x * 7.f / 8.f - (p2->getWidth() / 2.f),
 		((float)windowSize.y - p2->getHeight()) / 2.f));
 	p2->setControlKeys(sf::Keyboard::Key::Up, sf::Keyboard::Key::Down);
+	p2->setBounceLeft();
 
 	// TEMP: Create UI Score text.
 	if (!font.loadFromFile("Minecraft.ttf")) {

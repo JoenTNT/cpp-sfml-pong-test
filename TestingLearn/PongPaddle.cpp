@@ -2,26 +2,84 @@
 
 void pong::PongPaddle::checkBall(PongBall* ball)
 {
+	// Get paddle and ball position.
+	sf::Vector2f ballPos = ball->getPosition();
+	sf::Vector2f paddlePos = getPosition();
+	sf::Vector2f paddleSize = getSize();
+	unsigned long ballID = ball->getObjectID();
+	float ballDiameter = ball->getDiameter();
 
+	// Check left face of paddle hit. (Ball hit to the right)
+	float ballRightBound = ballPos.x + ballDiameter;
+	if (bounceLeft && ballRightBound > paddlePos.x && ballPos.x < paddlePos.x) {
+		// Check if the ball is still inside the paddle, then ignore process.
+		if (ballInsidePaddle.find(ballID) != ballInsidePaddle.end())
+			return;
+
+		// Check on Y hit.
+		if (isBallOnYHit(ballPos, paddlePos, ballDiameter, paddleSize.y))
+		{
+			// Bounce the ball.
+			ball->bounceX();
+
+			// Ball status inside the paddle must be ignored on the next frame.
+			ballInsidePaddle.insert(ballID);
+		}
+		return;
+	}
+
+	// Check right face of paddle hit. (Ball hit to the left)
+	float rightBound = paddlePos.x + paddleSize.x;
+	if (bounceRight && ballPos.x < rightBound && ballRightBound > rightBound) {
+		// Check if the ball is still inside the paddle, then ignore process.
+		if (ballInsidePaddle.find(ballID) != ballInsidePaddle.end())
+			return;
+
+		// Check on Y hit.
+		if (isBallOnYHit(ballPos, paddlePos, ballDiameter, paddleSize.y))
+		{
+			// Bounce the ball.
+			ball->bounceX();
+
+			// Ball status inside the paddle must be ignored on the next frame.
+			ballInsidePaddle.insert(ballID);
+		}
+		return;
+	}
+
+	// If not both above, try release ball from inside the paddle.
+	if (ballInsidePaddle.find(ballID) != ballInsidePaddle.end())
+		ballInsidePaddle.erase(ballID);
 }
 
-void pong::PongPaddle::listenOnAddRuntime(unsigned long id, Runtime* runtimeObj)
+bool pong::PongPaddle::isBallOnYHit(sf::Vector2f ballPos, sf::Vector2f paddlePos, float ballDiameter,
+	float paddleHeight)
 {
-	PongBall* ball = dynamic_cast<PongBall*>(runtimeObj);
-	if (ball) {
-		std::cout << "Found Ball!" << std::endl;
-	}
+	// Check if ball is under the paddle.
+	if (ballPos.y > paddlePos.y + paddleHeight)
+		return false;
+
+	// Check if ball is above the paddle.
+	if (ballPos.y + ballDiameter < paddlePos.y)
+		return false;
+
+	// Else then the ball hit the paddle.
+	return true;
 }
 
 pong::PongPaddle::PongPaddle(sf::RenderWindow* window, sf::Vector2f paddleSize) : GameObject2D(window)
 {
-	//// Create velocity object.
+	// Create velocity object.
 	velocityHandler = new pong::Velocity2D(this);
 	shape.setFillColor(sf::Color::White);
 
 	// Create paddle shape.
 	shape = sf::RectangleShape(paddleSize);
 	ballsOnMap = std::unordered_map<unsigned long, pong::PongBall*>();
+	ballInsidePaddle = std::unordered_set<unsigned long>();
+
+	// Create subscriber.
+	onAddRuntimeEvSubs = RuntimeContainer::createOnAddRuntimeEvSubs();
 }
 
 pong::PongPaddle::PongPaddle(sf::RenderWindow* window, float sizeX, float sizeY) : GameObject2D(window)
@@ -31,11 +89,22 @@ pong::PongPaddle::PongPaddle(sf::RenderWindow* window, float sizeX, float sizeY)
 
 	// Create paddle shape.
 	shape = sf::RectangleShape(sf::Vector2f(sizeX, sizeY));
+
+	// Create subscriber.
+	onAddRuntimeEvSubs = RuntimeContainer::createOnAddRuntimeEvSubs();
+	onAddRuntimeFunc = [this](const OnAddRuntimeEventArgs& args) {
+		PongBall* ball = dynamic_cast<PongBall*>(args.runtime);
+		if (ball) {
+			std::cout << "Found Ball!" << std::endl;
+			ballsOnMap.emplace(std::make_pair(args.id, ball));
+		}
+	};
 }
 
 pong::PongPaddle::~PongPaddle()
 {
 	delete velocityHandler;
+	delete onAddRuntimeEvSubs;
 }
 
 pong::PongPaddle::PongPaddle(PongPaddle const& paddleRef) : GameObject2D(paddleRef)
@@ -87,16 +156,25 @@ float pong::PongPaddle::getHeight()
 	return shape.getSize().y;
 }
 
+void pong::PongPaddle::setBounceLeft()
+{
+	bounceLeft = true;
+	bounceRight = false;
+}
+
+void pong::PongPaddle::setBounceRight()
+{
+	bounceLeft = false;
+	bounceRight = true;
+}
+
 void pong::PongPaddle::onAwake()
 {
 	// Subscribe events.
-	/*auto binder = std::bind(&listenOnAddRuntime, this, std::placeholders::_1, std::placeholders::_2);
-	auto func = [this](unsigned long, Runtime*) {
-
-	};
-	pong::RuntimeContainer::subsOnAddRuntime([](unsigned long, Runtime*) {
-		;
-	});*/
+	//std::function<void(unsigned long, IRuntime*)> func;
+	//func = std::bind(&listenOnAddRuntime, this, std::placeholders::_1, std::placeholders::_2);
+	//pong::RuntimeContainer::subsOnAddRuntime(func);
+	onAddRuntimeEvSubs->Subscribe<OnAddRuntimeEventArgs>(onAddRuntimeFunc);
 }
 
 void pong::PongPaddle::onUpdate()
@@ -135,4 +213,9 @@ void pong::PongPaddle::onUpdate()
 
 void pong::PongPaddle::onEnd()
 {
+	// Unsubscribe events.
+	//std::function<void(unsigned long, IRuntime*)> func;
+	//func = std::bind(&listenOnAddRuntime, this, std::placeholders::_1, std::placeholders::_2);
+	//pong::RuntimeContainer::unsubsOnAddRuntime(func);
+	onAddRuntimeEvSubs->Unsubscribe<OnAddRuntimeEventArgs>(onAddRuntimeFunc);
 }

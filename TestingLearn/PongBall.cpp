@@ -8,6 +8,7 @@ pong::PongBall::PongBall(sf::RenderWindow* window, float ballRadius) : GameObjec
 
 	// Add velocity instance.
 	velocityHandler = new Velocity2D(this);
+	velocityHandler->setDirection(sf::Vector2f(176.5f, 125.5f));
 }
 
 pong::PongBall::~PongBall()

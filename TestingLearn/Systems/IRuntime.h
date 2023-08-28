@@ -5,7 +5,7 @@ namespace pong
 	/// <summary>
 	/// Runtime behaviour.
 	/// </summary>
-	class Runtime
+	class IRuntime
 	{
 	public:
 		/// <summary>

@@ -4,8 +4,8 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
+//#include "Systems/Runtime.h"
 #include "Time.h"
-//#include "Runtime.h"
 #include "GameObject2D.h"
 
 namespace pong
@@ -13,7 +13,7 @@ namespace pong
 	/// <summary>
 	/// Handles transform velocity movement.
 	/// </summary>
-	class Velocity2D final : public Runtime
+	class Velocity2D final : public IRuntime
 	{
 	private:
 		GameObject2D* gameObject;

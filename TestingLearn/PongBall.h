@@ -11,7 +11,7 @@
 
 namespace pong
 {
-	class PongBall final : public GameObject2D, public Runtime
+	class PongBall final : public GameObject2D, public IRuntime
 	{
 	private:
 		Velocity2D* velocityHandler;

@@ -11,9 +11,10 @@
 
 pong::GameApp::GameApp()
 {
-	// Create main window.
-	windowSize = sf::Vector2i(minWindowWidth, minWindowHeight);
+	// Create game system as mandatory.
+	sf::Vector2i windowSize = sf::Vector2i(minWindowWidth, minWindowHeight);
 	mainWindow = new sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), "PONG!");
+	gameSystem = new pong::GameSystem(mainWindow);
 	mainWindow->setFramerateLimit(60);
 	mainWindow->setVerticalSyncEnabled(true);
 
@@ -26,6 +27,7 @@ pong::GameApp::GameApp()
 pong::GameApp::~GameApp()
 {
 	delete mainWindow;
+	delete gameSystem;
 	delete background;
 }
 
@@ -38,7 +40,7 @@ pong::GameApp& pong::GameApp::getInstance()
 
 sf::Vector2i pong::GameApp::getWindowSize()
 {
-	return getInstance().windowSize;
+	return static_cast<sf::Vector2i>(getInstance().mainWindow->getView().getSize());
 }
 
 bool pong::GameApp::isRunning()
@@ -48,39 +50,8 @@ bool pong::GameApp::isRunning()
 
 void pong::GameApp::onAwake()
 {
-	// TEMP: Add a new ball before event subcription.
-	pong::PongBall* mainBall = new pong::PongBall(mainWindow, 12.5f);
-	pong::RuntimeContainer::addRuntime(mainBall->getObjectID(), mainBall);
-
-	// Set initial position of the ball to the middle of the window.
-	float ballRadius = mainBall->getRadius();
-	mainBall->setPosition((static_cast<sf::Vector2f>(windowSize) / 2.f)
-		- sf::Vector2f(ballRadius, ballRadius));
-
-	// Create player 1.
-	pong::PongPaddle* p1 = new pong::PongPaddle(mainWindow, sf::Vector2f(20.f, 60.f));
-	pong::RuntimeContainer::addRuntime(p1->getObjectID(), p1);
-	p1->setPosition(sf::Vector2f((float)windowSize.x / 8.f,
-		((float)windowSize.y - p1->getHeight()) / 2.f));
-	p1->setControlKeys(sf::Keyboard::Key::W, sf::Keyboard::Key::S);
-	p1->setBounceRight();
-
-	// Create player 2.
-	pong::PongPaddle* p2 = new pong::PongPaddle(mainWindow, sf::Vector2f(20.f, 60.f));
-	pong::RuntimeContainer::addRuntime(p2->getObjectID(), p2);
-	p2->setPosition(sf::Vector2f((float)windowSize.x * 7.f / 8.f - (p2->getWidth() / 2.f),
-		((float)windowSize.y - p2->getHeight()) / 2.f));
-	p2->setControlKeys(sf::Keyboard::Key::Up, sf::Keyboard::Key::Down);
-	p2->setBounceLeft();
-
-	// TEMP: Create UI Score text.
-	if (!font.loadFromFile("Minecraft.ttf")) {
-		throw std::runtime_error("[ERROR] Target font not found!");
-	}
-	scoreText = sf::Text("0", font, 36u);
-	scoreText.setFillColor(sf::Color::White);
-	scoreText.setPosition(sf::Vector2f(((float)windowSize.x
-		- scoreText.getLocalBounds().width) / 2.f, 18.f));
+	// Initialize objects from system.
+	gameSystem->initGame();
 
 	// Run awake method.
 	pong::RuntimeContainer::awake();
@@ -125,7 +96,7 @@ void pong::GameApp::onUpdate()
 
 			case sf::Event::Resized:
 				// Locked window resize.
-				windowSize = static_cast<sf::Vector2i>(mainWindow->getSize());
+				sf::Vector2i windowSize = getWindowSize();
 				if (windowSize.x < minWindowWidth) windowSize.x = minWindowWidth;
 				if (windowSize.y < minWindowHeight) windowSize.y = minWindowHeight;
 

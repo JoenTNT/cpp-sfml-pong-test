@@ -48,15 +48,10 @@ namespace pong
 
 		template <typename EventType>
 		void Invoke(const EventType& ev) {
-			try {
-				// Attempt to invoke the function
-				for (auto const& evsub : *evv)
-					evsub.second(ev);
-			}
-			catch (const std::bad_function_call& e) {
-				// Handle the exception (e.g., log an error message)
-				std::cerr << "Error invoking function: " << e.what() << std::endl;
-				std::cout << evv << std::endl;
+			// Attempt to invoke the functions.
+			for (auto const evsub : *evv) {
+				std::function<void(const Event&)> e = evsub.second;
+				e(ev);
 			}
 		}
 	};

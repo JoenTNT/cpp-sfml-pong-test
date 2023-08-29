@@ -39,7 +39,7 @@
     <ClCompile Include="RuntimeContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GameSystem.cpp">
+    <ClCompile Include="Systems\GameSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,7 +50,7 @@
     <ClInclude Include="GameApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Systems\IRuntime.h">
+    <ClInclude Include="Interfaces\IRuntime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PongPaddle.h">
@@ -68,7 +68,7 @@
     <ClInclude Include="RuntimeContainer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameSystem.h">
+    <ClInclude Include="Systems\GameSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Events\EventSystem.h">

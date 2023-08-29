@@ -153,7 +153,7 @@
   <ItemGroup>
     <ClCompile Include="GameApp.cpp" />
     <ClCompile Include="GameObject2D.cpp" />
-    <ClCompile Include="GameSystem.cpp" />
+    <ClCompile Include="Systems\GameSystem.cpp" />
     <ClCompile Include="RuntimeContainer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PongBall.cpp" />
@@ -165,11 +165,11 @@
     <ClInclude Include="Events\EventSystem.h" />
     <ClInclude Include="GameApp.h" />
     <ClInclude Include="GameObject2D.h" />
-    <ClInclude Include="GameSystem.h" />
+    <ClInclude Include="Systems\GameSystem.h" />
     <ClInclude Include="RuntimeContainer.h" />
     <ClInclude Include="PongBall.h" />
     <ClInclude Include="PongPaddle.h" />
-    <ClInclude Include="Systems\IRuntime.h" />
+    <ClInclude Include="Interfaces\IRuntime.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Velocity2D.h" />
   </ItemGroup>

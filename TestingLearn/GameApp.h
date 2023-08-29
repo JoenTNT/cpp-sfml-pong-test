@@ -7,16 +7,16 @@
 #include <SFML/Graphics.hpp>
 
 //#include "PongBall.h"
-#include "PongPaddle.h"
+//#include "PongPaddle.h"
+#include "Systems/GameSystem.h"
 
 namespace pong
 {
 	class GameApp final : public IRuntime
 	{
 	private: // Variables
+		GameSystem* gameSystem;
 		sf::RenderWindow* mainWindow;
-		
-		sf::Vector2i windowSize;
 		sf::RectangleShape* background;
 
 		sf::Text scoreText;

@@ -8,7 +8,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "Events/EventSystem.h"
-#include "Systems/IRuntime.h"
+#include "Interfaces/IRuntime.h"
 
 namespace pong
 {

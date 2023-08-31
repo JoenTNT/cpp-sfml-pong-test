@@ -4,11 +4,10 @@ pong::PongBall::PongBall(sf::RenderWindow* window, float ballRadius) : GameObjec
 {
 	// Create shape.
 	shape = sf::CircleShape(ballRadius);
-	shape.setFillColor(sf::Color::White);
+	shape.setFillColor(sf::Color::Red);
 
 	// Add velocity instance.
 	velocityHandler = new Velocity2D(this);
-	velocityHandler->setDirection(sf::Vector2f(176.5f, 125.5f));
 }
 
 pong::PongBall::~PongBall()
@@ -49,7 +48,11 @@ float pong::PongBall::getDiameter()
 
 void pong::PongBall::setSpeed(float speed)
 {
+	// Set initial speed.
 	moveSpeed = speed;
+
+	// Set velocity.
+	velocityHandler->setDirection(velocityHandler->getNormalDir() * moveSpeed);
 }
 
 float pong::PongBall::getSpeed()
@@ -65,6 +68,18 @@ void pong::PongBall::setAccelerate(float accelerate)
 float pong::PongBall::getAccelerate()
 {
 	return accelerateSpeed;
+}
+
+void pong::PongBall::setVelocity(sf::Vector2f dir)
+{
+	// Set inner velocity.
+	velocityHandler->setDirection(dir * moveSpeed);
+}
+
+void pong::PongBall::accelerate()
+{
+	// Accelerate.
+	setSpeed(moveSpeed + accelerateSpeed);
 }
 
 void pong::PongBall::bounceX()
@@ -141,4 +156,33 @@ void pong::PongBall::onUpdate()
 
 void pong::PongBall::onEnd()
 {
+}
+
+sf::Vector2f pong::PongBall::getRandomDir()
+{
+	// Randomize max degree.
+	std::random_device rd;
+	std::mt19937 rng(rd());
+	std::uniform_real_distribution<float> dist(0.f, limitDegreeOnY);
+	float maxDegree = dist(rng);
+
+	// Randomize angle degree that capped to max degree.
+	dist = std::uniform_real_distribution<float>(-maxDegree, maxDegree);
+	float shootDegree = dist(rng);
+
+	// Convert to radian.
+	float angleRad = shootDegree * static_cast<float>(std::_Pi) / 180.f;
+
+	// Randomize X Direction.
+	dist = std::uniform_real_distribution<float>(-1.f, 1.f);
+	float xDir = dist(rng);
+
+	// Directions.
+	float x = std::cos(angleRad);
+	float y = std::sin(angleRad);
+
+	// Check if y is far away from x, then switch.
+	if (y > x) std::swap(x, y);
+
+	return sf::Vector2f(xDir * x, y);
 }

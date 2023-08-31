@@ -63,7 +63,7 @@ unsigned long pong::GameObject2D::getObjectID()
 	return objectID;
 }
 
-void pong::GameObject2D::onWindowDraw(sf::Shape* shape)
+void pong::GameObject2D::onWindowDraw(sf::Drawable* shape)
 {
 	window->draw(*shape);
 }

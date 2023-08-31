@@ -14,11 +14,13 @@ namespace pong
 	class PongBall final : public GameObject2D, public IRuntime
 	{
 	private:
+		const float limitDegreeOnY = 70.f;
+
 		Velocity2D* velocityHandler;
 		sf::CircleShape shape;
 
-		float moveSpeed = 0.f;
-		float accelerateSpeed = 2.f;
+		float moveSpeed = 250.f;
+		float accelerateSpeed = 25.f;
 
 	public:
 		PongBall(sf::RenderWindow* window, float ballRadius);
@@ -35,6 +37,9 @@ namespace pong
 		void setAccelerate(float accelerate);
 		float getAccelerate();
 
+		void setVelocity(sf::Vector2f dir);
+		void accelerate();
+
 		/// <summary>
 		/// Bounce function against something on x axis.
 		/// </summary>
@@ -48,5 +53,7 @@ namespace pong
 		void onAwake();
 		void onUpdate();
 		void onEnd();
+
+		sf::Vector2f getRandomDir();
 	};
 }

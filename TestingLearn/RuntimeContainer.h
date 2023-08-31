@@ -9,6 +9,7 @@
 
 #include "Events/EventSystem.h"
 #include "Interfaces/IRuntime.h"
+#include "Interfaces/IContainer.h"
 
 namespace pong
 {
@@ -23,17 +24,13 @@ namespace pong
 		OnAddRuntimeEventArgs(unsigned long id, IRuntime* runtime) : id(id), runtime(runtime) { }
 	};
 
-	class RuntimeContainer
+	class RuntimeContainer : public IContainer
 	{
 	private:
 		std::unordered_map<unsigned long, IRuntime*> entities;
-		//std::unordered_set<void(*)(unsigned long, Runtime*)> onAddRuntime;
-		//std::unordered_set<std::function<void(unsigned long, IRuntime*)>> onAddRuntime;
 		
 		std::unordered_multimap<const void*, std::function<void(const Event&)>> onAddRuntimeEvCont;
 		Invoker* onAddRuntimeEvInvk;
-
-		//typedef void(*onAddRuntime)(unsigned long, Runtime*);
 
 		RuntimeContainer();
 		~RuntimeContainer();
@@ -67,12 +64,6 @@ namespace pong
 		/// </summary>
 		/// <returns></returns>
 		static Subscriber* createOnAddRuntimeEvSubs();
-
-		//static void subsOnAddRuntime(void(*func)(unsigned long, Runtime*));
-		//static void unsubsOnAddRuntime(void(*func)(unsigned long, Runtime*));
-
-		//static void subsOnAddRuntime(std::function<void(unsigned long, IRuntime*)> func);
-		//static void unsubsOnAddRuntime(std::function<void(unsigned long, IRuntime*)> func);
 
 		static void awake();
 		static void update();

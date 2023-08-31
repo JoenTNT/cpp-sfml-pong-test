@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <cstdlib>
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -26,6 +27,9 @@ namespace pong
 		void setDirection(sf::Vector2f dir);
 		void setDirection(float x, float y);
 		sf::Vector2f getDirection();
+
+		float getMagnitude();
+		sf::Vector2f getNormalDir();
 
 		void onAwake();
 		void onUpdate();

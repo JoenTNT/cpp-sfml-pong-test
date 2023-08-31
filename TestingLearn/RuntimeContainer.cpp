@@ -4,9 +4,8 @@ pong::RuntimeContainer::RuntimeContainer()
 {
 	// Intialize collection.
 	entities = std::unordered_map<unsigned long, IRuntime*>();
-	//onAddRuntime = std::unordered_set<std::function<void(unsigned long, Runtime*)>*>();
-	//onAddRuntime = std::unordered_set<std::function<void(unsigned long, IRuntime*)>>();
 
+	// Initialized events.
 	onAddRuntimeEvCont = std::unordered_multimap<const void*, std::function<void(const Event&)>>();
 	onAddRuntimeEvInvk = new Invoker(&onAddRuntimeEvCont);
 }
@@ -37,38 +36,8 @@ void pong::RuntimeContainer::addRuntime(unsigned long id, IRuntime* runtime)
 	instance.entities[id] = runtime;
 
 	// Call an event.
-	instance.onAddRuntimeEvInvk->Invoke(OnAddRuntimeEventArgs(id, runtime));
+	instance.onAddRuntimeEvInvk->Invoke(pong::OnAddRuntimeEventArgs(id, runtime));
 }
-
-//void pong::RuntimeContainer::subsOnAddRuntime(void(*func)(unsigned long, Runtime*))
-//{
-//	std::cout << "Subscribe Function " << func << std::endl;
-//	getInstance().onAddRuntime.insert(func);
-//}
-//
-//void pong::RuntimeContainer::unsubsOnAddRuntime(void(*func)(unsigned long, Runtime*))
-//{
-//	std::cout << "Unsubscribe Function " << func << std::endl;
-//	getInstance().onAddRuntime.erase(func);
-//}
-
-//void pong::RuntimeContainer::subsOnAddRuntime(std::function<void(unsigned long, IRuntime*)> func)
-//{
-//	std::cout << "Subscribe Function " << &func << std::endl;
-//
-//	// Insert new event.
-//	getInstance().onAddRuntime.insert(func);
-//}
-//
-//void pong::RuntimeContainer::unsubsOnAddRuntime(std::function<void(unsigned long, IRuntime*)> func)
-//{
-//	std::cout << "Unsubscribe Function " << &func << std::endl;
-//
-//	// Find and delete event.
-//	auto ev = getInstance().onAddRuntime;
-//	auto it = std::find(ev.begin(), ev.end(), func);
-//	if (it != ev.end()) ev.erase(it);
-//}
 
 pong::Subscriber* pong::RuntimeContainer::createOnAddRuntimeEvSubs()
 {

@@ -43,6 +43,6 @@ namespace pong
 		/// Draw a shape to target window.
 		/// </summary>
 		/// <param name="shape">Target shape</param>
-		void onWindowDraw(sf::Shape* shape);
+		void onWindowDraw(sf::Drawable* shape);
 	};
 }

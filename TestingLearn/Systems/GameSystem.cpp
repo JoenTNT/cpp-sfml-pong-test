@@ -2,10 +2,21 @@
 
 pong::GameSystem::GameSystem(sf::RenderWindow* window)
 {
+	// Set window reference.
 	this->window = window;
+
+	// Set initial status.
+	status = GameStatus();
 }
 
-pong::GameSystem::~GameSystem() { }
+pong::GameSystem::~GameSystem()
+{
+	playerOne = nullptr;
+	playerTwo = nullptr;
+	ball = nullptr;
+	scoreP1 = nullptr;
+	scoreP2 = nullptr;
+}
 
 pong::GameSystem::GameSystem(GameSystem const& arg)
 {
@@ -21,33 +32,41 @@ void pong::GameSystem::operator=(GameSystem const& arg)
 
 void pong::GameSystem::initGame()
 {
-	// Create a ball.
+	// Get window size.
 	sf::Vector2f windowSize = getWindowSize();
-	pong::GameSystem::createBall(windowSize / 2.f);
 
 	// Create player 1.
-	pong::GameSystem::createPaddle(sf::Vector2f(windowSize.x / 8.f,
+	playerOne = createPaddle(sf::Vector2f(windowSize.x / 8.f,
 		windowSize.y / 2.f), sf::Keyboard::Key::W, sf::Keyboard::Key::S, false);
 
 	// Create player 2.
-	pong::GameSystem::createPaddle(sf::Vector2f(windowSize.x * 7.f / 8.f,
+	playerTwo = createPaddle(sf::Vector2f(windowSize.x * 7.f / 8.f,
 		windowSize.y / 2.f), sf::Keyboard::Key::Up, sf::Keyboard::Key::Down, true);
 
-	// Create score for playr 1.
-	pong::Score score = pong::Score(window, "Minecraft.ttf");
-	sf::Vector2f((getWindowSize().x - score.getLocalBounds().width) / 2.f, 18.f)
+	// Create score for each players.
+	scoreP1 = createScore(sf::Vector2f(getWindowSize().x / 4.f, 32.f), "Minecraft.ttf");
+	scoreP2 = createScore(sf::Vector2f(getWindowSize().x * 3.f / 4.f, 32.f), "Minecraft.ttf");
 }
 
 void pong::GameSystem::startGame()
 {
+	// Reset countdown timer.
+	tempBallRunIn = ballRunIn;
+
+	// Set status.
+	status.isStarting = true;
 }
 
 void pong::GameSystem::resetGame()
 {
+	// Set status.
+	status.isRunning = false;
 }
 
 void pong::GameSystem::pauseGame()
 {
+	// Set status.
+	status.isRunning = false;
 }
 
 sf::Vector2f pong::GameSystem::getWindowSize()
@@ -82,7 +101,43 @@ pong::PongPaddle* pong::GameSystem::createPaddle(sf::Vector2f placement,
 	return p;
 }
 
+pong::Score* pong::GameSystem::createScore(sf::Vector2f placement, std::string fontFile)
+{
+	pong::Score* score = new pong::Score(window, fontFile);
+	score->setPosition(placement - (score->getBoundSize() / 2.f));
+	pong::UIContainer::addRenderUI(score->getObjectID(), score);
+	return score;
+}
+
+bool pong::GameSystem::isRoundCountdown()
+{
+	// Check countdown.
+	if (tempBallRunIn > 0.f) {
+		// Ticking a counter.
+		tempBallRunIn -= pong::Time::getFixedDelta();
+
+		// Release the ball if finish countdown.
+		if (tempBallRunIn <= 0.f) {
+			// Create a ball and set random direction, if already exists then set all initial info.
+			if (ball)
+			{
+				float ballDiameter = ball->getDiameter();
+				ball->setPosition((getWindowSize() - sf::Vector2f(ballDiameter, ballDiameter)) / 2.f);
+			}
+			else ball = pong::GameSystem::createBall(getWindowSize() / 2.f);
+			ball->setSpeed(initialBallSpeed);
+			ball->setVelocity(ball->getRandomDir());
+
+			// Set status.
+			status.isRunning = true;
+			status.isStarting = false;
+		}
+	}
+
+	return false;
+}
+
 bool pong::GameSystem::isRoundRunning()
 {
-	return isRunning;
+	return status.isRunning;
 }

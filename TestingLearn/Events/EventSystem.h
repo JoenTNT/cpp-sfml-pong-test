@@ -49,9 +49,8 @@ namespace pong
 		template <typename EventType>
 		void Invoke(const EventType& ev) {
 			// Attempt to invoke the functions.
-			for (auto const evsub : *evv) {
-				std::function<void(const Event&)> e = evsub.second;
-				e(ev);
+			for (auto const& evsub : *evv) {
+				evsub.second(ev);
 			}
 		}
 	};

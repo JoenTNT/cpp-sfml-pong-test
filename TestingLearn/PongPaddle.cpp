@@ -19,8 +19,9 @@ void pong::PongPaddle::checkBall(PongBall* ball)
 		// Check on Y hit.
 		if (isBallOnYHit(ballPos, paddlePos, ballDiameter, paddleSize.y))
 		{
-			// Bounce the ball.
+			// Bounce the ball and accelerate it.
 			ball->bounceX();
+			ball->accelerate();
 
 			// Ball status inside the paddle must be ignored on the next frame.
 			ballInsidePaddle.insert(ballID);
@@ -38,8 +39,9 @@ void pong::PongPaddle::checkBall(PongBall* ball)
 		// Check on Y hit.
 		if (isBallOnYHit(ballPos, paddlePos, ballDiameter, paddleSize.y))
 		{
-			// Bounce the ball.
+			// Bounce the ball and accelerate it.
 			ball->bounceX();
+			ball->accelerate();
 
 			// Ball status inside the paddle must be ignored on the next frame.
 			ballInsidePaddle.insert(ballID);
@@ -92,13 +94,6 @@ pong::PongPaddle::PongPaddle(sf::RenderWindow* window, float sizeX, float sizeY)
 
 	// Create subscriber.
 	onAddRuntimeEvSubs = RuntimeContainer::createOnAddRuntimeEvSubs();
-	onAddRuntimeFunc = [this](const OnAddRuntimeEventArgs& args) {
-		PongBall* ball = dynamic_cast<PongBall*>(args.runtime);
-		if (ball) {
-			std::cout << "Found Ball!" << std::endl;
-			ballsOnMap.emplace(std::make_pair(args.id, ball));
-		}
-	};
 }
 
 pong::PongPaddle::~PongPaddle()
@@ -170,16 +165,25 @@ void pong::PongPaddle::setBounceRight()
 
 void pong::PongPaddle::onAwake()
 {
+	// Create a functions.
+	onAddRuntimeFunc = [this](const OnAddRuntimeEventArgs& args) {
+		PongBall* ball = dynamic_cast<PongBall*>(args.runtime);
+		if (ball) {
+			std::cout << "Found Ball!" << std::endl;
+			ballsOnMap.emplace(std::make_pair(args.id, ball));
+		}
+	};
+
 	// Subscribe events.
-	//std::function<void(unsigned long, IRuntime*)> func;
-	//func = std::bind(&listenOnAddRuntime, this, std::placeholders::_1, std::placeholders::_2);
-	//pong::RuntimeContainer::subsOnAddRuntime(func);
 	onAddRuntimeEvSubs->Subscribe<OnAddRuntimeEventArgs>(onAddRuntimeFunc);
 }
 
 void pong::PongPaddle::onUpdate()
 {
 	// Check control key event.
+	sf::Vector2f paddlePos = getPosition();
+	float windowSizeY = getWindow()->getView().getSize().y;
+	float paddleSizeY = getSize().y, velDir = velocityHandler->getDirection().y;
 	isUpKeyPressed = sf::Keyboard::isKeyPressed(upKey);
 	isDownKeyPressed = sf::Keyboard::isKeyPressed(downKey);
 
@@ -197,14 +201,19 @@ void pong::PongPaddle::onUpdate()
 		velocityHandler->setDirection(sf::Vector2f(0.f, moveSpeed));
 	}
 
-	// Update velocity and run it.
-	velocityHandler->onUpdate();
+	// Check limit.
+	if (!(paddlePos.y + paddleSizeY >= windowSizeY && velDir > 0.f)
+		&& !(paddlePos.y <= 0.f && velDir < -0.f))
+	{
+		// Update velocity and run it.
+		velocityHandler->onUpdate();
+	}
 
 	// Set sprite position.
-	shape.setPosition(getPosition());
+	shape.setPosition(paddlePos);
 
 	// Check if a ball hits the paddle.
-	RuntimeContainer::getRuntimeObjects(&ballsOnMap);
+	//RuntimeContainer::getRuntimeObjects(&ballsOnMap);
 	for (auto& ball : ballsOnMap) checkBall(ball.second);
 
 	// Draw the paddle.

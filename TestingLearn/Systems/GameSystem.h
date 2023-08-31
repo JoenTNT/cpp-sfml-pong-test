@@ -6,16 +6,29 @@
 
 #include "../Score.h"
 #include "../PongPaddle.h"
+#include "../UIContainer.h"
 
 namespace pong
 {
+	struct GameStatus {
+		bool isStarting = false;
+		bool isRunning = false;
+	};
+
 	class GameSystem final
 	{
 	private:
 		sf::RenderWindow* window;
+		PongPaddle* playerOne = nullptr;
+		PongPaddle* playerTwo = nullptr;
+		PongBall* ball = nullptr;
+		Score* scoreP1 = nullptr;
+		Score* scoreP2 = nullptr;
 
+		GameStatus status;
+		float initialBallSpeed = 250.f;
 		float ballRunIn = 3.f; // In Seconds.
-		bool isRunning = false;
+		float tempBallRunIn = 0.f;
 
 	public:
 		GameSystem(sf::RenderWindow* window);
@@ -34,7 +47,9 @@ namespace pong
 		pong::PongBall* createBall(sf::Vector2f centerWindow);
 		pong::PongPaddle* createPaddle(sf::Vector2f placement,
 			sf::Keyboard::Key upKey, sf::Keyboard::Key downKey, bool isLeftBounce);
+		pong::Score* createScore(sf::Vector2f placement, std::string fontFile);
 
+		bool isRoundCountdown();
 		bool isRoundRunning();
 	};
 }

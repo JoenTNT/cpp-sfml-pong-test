@@ -30,6 +30,16 @@ sf::Vector2f pong::Velocity2D::getDirection()
 	return direction;
 }
 
+float pong::Velocity2D::getMagnitude()
+{
+	return std::sqrtf(direction.x * direction.x + direction.y * direction.y);
+}
+
+sf::Vector2f pong::Velocity2D::getNormalDir()
+{
+	return direction / getMagnitude();
+}
+
 void pong::Velocity2D::onAwake()
 {
 }

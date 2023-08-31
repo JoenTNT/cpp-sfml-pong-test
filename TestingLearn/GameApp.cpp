@@ -59,6 +59,9 @@ void pong::GameApp::onAwake()
 	//float tempSecBeforeChangeBackground = changeBackgroundElapse, lerpPercent;
 	//sf::Color nextColor = sf::Color(std::rand() % 256, std::rand() % 256, std::rand() % 256);
 	//sf::Color elapsedColor(0, 0, 0);
+
+	// Start the game.
+	gameSystem->startGame();
 }
 
 sf::Vector2f fWindowSize;
@@ -141,10 +144,15 @@ void pong::GameApp::onUpdate()
 
 	//// Set background fill color.
 	//mainWindowBackgroundFill.setFillColor(elapsedColor);
+	
+	// Check game system status is running.
+	if (!gameSystem->isRoundCountdown()) {
+
+	}
 
 	// Runtime update all runtime.
 	pong::RuntimeContainer::update();
-	mainWindow->draw(scoreText);
+	pong::UIContainer::render();
 
 	// Draw new frame.
 	mainWindow->display();
@@ -153,4 +161,5 @@ void pong::GameApp::onUpdate()
 void pong::GameApp::onEnd()
 {
 	pong::RuntimeContainer::end();
+	pong::UIContainer::clear();
 }

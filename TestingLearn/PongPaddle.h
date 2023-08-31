@@ -19,10 +19,11 @@ namespace pong
 	private:
 		std::unordered_map<unsigned long, PongBall*> ballsOnMap;
 		std::unordered_set<unsigned long> ballInsidePaddle;
-		Velocity2D* velocityHandler;
+		Velocity2D* velocityHandler = nullptr;
 		sf::RectangleShape shape;
 
-		Subscriber* onAddRuntimeEvSubs;
+		std::function<void(const OnAddRuntimeEventArgs&)> onAddRuntimeFunc;
+		Subscriber* onAddRuntimeEvSubs = nullptr;
 
 		float moveSpeed = 192.f;
 
@@ -38,8 +39,6 @@ namespace pong
 		void checkBall(PongBall* ball);
 		bool isBallOnYHit(sf::Vector2f ballPos, sf::Vector2f paddlePos, float ballDiameter, 
 			float paddleHeight);
-
-		std::function<void(const OnAddRuntimeEventArgs&)> onAddRuntimeFunc;
 
 	public:
 		PongPaddle(sf::RenderWindow* window, sf::Vector2f paddleSize);

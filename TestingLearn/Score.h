@@ -5,6 +5,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
+#include "Interfaces/IRenderUI.h"
 #include "GameObject2D.h"
 
 namespace pong
@@ -12,7 +13,7 @@ namespace pong
 	/// <summary>
 	/// Handle display score.
 	/// </summary>
-	class Score final : public GameObject2D
+	class Score final : public GameObject2D, public IRenderUI
 	{
 	private:
 		sf::Text* text;
@@ -24,10 +25,13 @@ namespace pong
 
 		~Score();
 		Score(Score const& arg);
-		void operator=(Score const& arg);
+		pong::Score& operator=(Score const& arg);
+
+		void render();
 		
+		sf::Vector2f getBoundSize();
 		void setScore(int value);
-		float getScore();
+		int getScore();
 
 		bool operator>(Score const& comp);
 		bool operator<(Score const& comp);

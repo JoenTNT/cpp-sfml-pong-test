@@ -25,8 +25,8 @@ namespace pong
 			evv->emplace(std::make_pair(callbackAddress, [callback](const Event& event) {
 				callback(dynamic_cast<const EventType&>(event));
 			}));
-			std::cout << "Subscribed: " << callbackAddress << "; Amount of subs: ";
-			std::cout << static_cast<int>(evv->size()) << std::endl;
+			//std::cout << "Subscribed: " << callbackAddress << "; Amount of subs: ";
+			//std::cout << static_cast<int>(evv->size()) << std::endl;
 		}
 
 		template <typename EventType>
@@ -38,8 +38,8 @@ namespace pong
 					break;
 				}
 			}
-			std::cout << "Unsubscribed: " << callbackAddress << "; Amount of subs: ";
-			std::cout << static_cast<int>(evv->size()) << std::endl;
+			//std::cout << "Unsubscribed: " << callbackAddress << "; Amount of subs: ";
+			//std::cout << static_cast<int>(evv->size()) << std::endl;
 		}
 	};
 

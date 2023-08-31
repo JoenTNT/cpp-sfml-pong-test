@@ -77,6 +77,7 @@ void pong::GameApp::onAwake()
 
 	// Start the game.
 	gameSystem->startGame();
+	std::cout << "Game is Running..." << std::endl;
 }
 
 sf::Vector2f fWindowSize;

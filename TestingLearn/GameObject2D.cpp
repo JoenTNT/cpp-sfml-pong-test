@@ -14,7 +14,7 @@ pong::GameObject2D::GameObject2D(sf::RenderWindow* window)
 	objectID = getRandomID();
 
 	// Debuging.
-	std::cout << "[DEBUG] Object generated with ID: " << objectID << std::endl;
+	//std::cout << "[DEBUG] Object generated with ID: " << objectID << std::endl;
 }
 
 pong::GameObject2D::~GameObject2D()

@@ -19,8 +19,15 @@ void pong::PongPaddle::checkBall(PongBall* ball)
 		// Check on Y hit.
 		if (isBallOnYHit(ballPos, paddlePos, ballDiameter, paddleSize.y))
 		{
+			// Calculate change of velocity.
+			sf::Vector2f halfSize(paddleSize /= 2.f);
+			paddlePos += halfSize;
+			sf::Vector2f midPointBounce(paddlePos.x + coneBackBouncePoint, paddlePos.y);
+			ballPos += sf::Vector2f(ballDiameter, ballDiameter) / 2.f;
+
 			// Bounce the ball and accelerate it.
-			ball->bounceX();
+			//ball->bounceX();
+			ball->setVelocity(ballPos - midPointBounce);
 			ball->accelerate();
 
 			// Ball status inside the paddle must be ignored on the next frame.
@@ -39,8 +46,15 @@ void pong::PongPaddle::checkBall(PongBall* ball)
 		// Check on Y hit.
 		if (isBallOnYHit(ballPos, paddlePos, ballDiameter, paddleSize.y))
 		{
+			// Calculate change of velocity.
+			sf::Vector2f halfSize(paddleSize /= 2.f);
+			paddlePos += halfSize;
+			sf::Vector2f midPointBounce(paddlePos.x - coneBackBouncePoint, paddlePos.y);
+			ballPos += sf::Vector2f(ballDiameter, ballDiameter) / 2.f;
+
 			// Bounce the ball and accelerate it.
-			ball->bounceX();
+			// ball->bounceX();
+			ball->setVelocity(ballPos - midPointBounce);
 			ball->accelerate();
 
 			// Ball status inside the paddle must be ignored on the next frame.
@@ -168,10 +182,7 @@ void pong::PongPaddle::onAwake()
 	// Create a functions.
 	onAddRuntimeFunc = [this](const OnAddRuntimeEventArgs& args) {
 		PongBall* ball = dynamic_cast<PongBall*>(args.runtime);
-		if (ball) {
-			std::cout << "Found Ball!" << std::endl;
-			ballsOnMap.emplace(std::make_pair(args.id, ball));
-		}
+		if (ball) ballsOnMap.emplace(std::make_pair(args.id, ball));
 	};
 
 	// Subscribe events.

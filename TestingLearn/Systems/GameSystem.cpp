@@ -1,6 +1,6 @@
 #include "GameSystem.h"
 
-pong::GameSystem::GameSystem(sf::RenderWindow* window)
+pong::GameSystem::GameSystem(sf::RenderWindow* window) : onBallScoreEvSubs(nullptr)
 {
 	// Set window reference.
 	this->window = window;
@@ -11,6 +11,9 @@ pong::GameSystem::GameSystem(sf::RenderWindow* window)
 
 pong::GameSystem::~GameSystem()
 {
+	// Unsubscribe events.
+	onBallScoreEvSubs->Unsubscribe(onBallScoreFunc);
+
 	playerOne = nullptr;
 	playerTwo = nullptr;
 	ball = nullptr;
@@ -18,16 +21,22 @@ pong::GameSystem::~GameSystem()
 	scoreP2 = nullptr;
 }
 
-pong::GameSystem::GameSystem(GameSystem const& arg)
+pong::GameSystem::GameSystem(GameSystem const& arg) : onBallScoreEvSubs(nullptr)
 {
 	// Copy value.
 	window = arg.window;
+
+	// Set initial status.
+	status = GameStatus();
 }
 
 void pong::GameSystem::operator=(GameSystem const& arg)
 {
 	// Copy value.
 	window = arg.window;
+
+	// Set initial status.
+	status = arg.status;
 }
 
 void pong::GameSystem::initGame()
@@ -61,6 +70,13 @@ void pong::GameSystem::resetGame()
 {
 	// Set status.
 	status.isRunning = false;
+
+	// Reset ball position to the middle.
+	float ballDiameter = ball->getDiameter();
+	ball->setPosition((getWindowSize() - sf::Vector2f(ballDiameter, ballDiameter)) / 2.f);
+
+	// Start the game immediately.
+	startGame();
 }
 
 void pong::GameSystem::pauseGame()
@@ -119,12 +135,26 @@ bool pong::GameSystem::isRoundCountdown()
 		// Release the ball if finish countdown.
 		if (tempBallRunIn <= 0.f) {
 			// Create a ball and set random direction, if already exists then set all initial info.
-			if (ball)
-			{
-				float ballDiameter = ball->getDiameter();
-				ball->setPosition((getWindowSize() - sf::Vector2f(ballDiameter, ballDiameter)) / 2.f);
+			if (!ball) {
+				// Create ball instance.
+				ball = pong::GameSystem::createBall(getWindowSize() / 2.f);
+
+				// Create events.
+				onBallScoreFunc = [this](const OnBallScoreEventArgs& arg) {
+					// Receive score.
+					if (arg.leftGoal) addP2Score(1);
+					if (arg.rightGoal) addP1Score(1);
+
+					// Reset the game system.
+					this->resetGame();
+				};
+
+				// Subscribe events.
+				onBallScoreEvSubs = ball->createOnBallScoreEvSubs();
+				onBallScoreEvSubs->Subscribe(onBallScoreFunc);
 			}
-			else ball = pong::GameSystem::createBall(getWindowSize() / 2.f);
+
+			// Set ball speed and velocity.
 			ball->setSpeed(initialBallSpeed);
 			ball->setVelocity(ball->getRandomDir());
 
@@ -132,6 +162,7 @@ bool pong::GameSystem::isRoundCountdown()
 			status.isRunning = true;
 			status.isStarting = false;
 		}
+		return true;
 	}
 
 	return false;
@@ -140,4 +171,14 @@ bool pong::GameSystem::isRoundCountdown()
 bool pong::GameSystem::isRoundRunning()
 {
 	return status.isRunning;
+}
+
+void pong::GameSystem::addP1Score(int a)
+{
+	scoreP1->setScore(scoreP1->getScore() + a);
+}
+
+void pong::GameSystem::addP2Score(int a)
+{
+	scoreP2->setScore(scoreP2->getScore() + a);
 }

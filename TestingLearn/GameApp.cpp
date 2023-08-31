@@ -60,6 +60,21 @@ void pong::GameApp::onAwake()
 	//sf::Color nextColor = sf::Color(std::rand() % 256, std::rand() % 256, std::rand() % 256);
 	//sf::Color elapsedColor(0, 0, 0);
 
+	// Initialize shape data.
+	int s = sizeof(midLine) / sizeof(midLine[0]);
+	sf::Vector2f ws = mainWindow->getView().getSize();
+	float radius = 4.f, heightSpace = ws.y / static_cast<float>(s), tempYPos;
+	for (int i = 0; i < s; i++) {
+		// Create shape.
+		midLine[i] = sf::CircleShape(radius);
+
+		// Calculate Y.
+		tempYPos = heightSpace * i + radius;
+
+		// Set fix position.
+		midLine[i].setPosition(sf::Vector2f(ws.x / 2.f, tempYPos));
+	}
+
 	// Start the game.
 	gameSystem->startGame();
 }
@@ -81,8 +96,10 @@ void pong::GameApp::onUpdate()
 	// Clear old frame.
 	mainWindow->clear();
 
-	// Draw main background.
+	// Draw main background and other decoration.
 	mainWindow->draw(*background);
+	int s = sizeof(midLine) / sizeof(midLine[0]);
+	for (int i = 0; i < s; i++) mainWindow->draw(midLine[i]);
 
 	// Handle events
 	sf::Event ev;
@@ -146,8 +163,8 @@ void pong::GameApp::onUpdate()
 	//mainWindowBackgroundFill.setFillColor(elapsedColor);
 	
 	// Check game system status is running.
-	if (!gameSystem->isRoundCountdown()) {
-
+	if (gameSystem->isRoundCountdown()) {
+		// TODO: Give signal.
 	}
 
 	// Runtime update all runtime.

@@ -10,6 +10,9 @@
 
 namespace pong
 {
+	/// <summary>
+	/// Contains all the game status.
+	/// </summary>
 	struct GameStatus {
 		bool isStarting = false;
 		bool isRunning = false;
@@ -24,6 +27,9 @@ namespace pong
 		PongBall* ball = nullptr;
 		Score* scoreP1 = nullptr;
 		Score* scoreP2 = nullptr;
+
+		std::function<void(const OnBallScoreEventArgs&)> onBallScoreFunc;
+		Subscriber* onBallScoreEvSubs = nullptr;
 
 		GameStatus status;
 		float initialBallSpeed = 250.f;
@@ -48,6 +54,9 @@ namespace pong
 		pong::PongPaddle* createPaddle(sf::Vector2f placement,
 			sf::Keyboard::Key upKey, sf::Keyboard::Key downKey, bool isLeftBounce);
 		pong::Score* createScore(sf::Vector2f placement, std::string fontFile);
+
+		void addP1Score(int a);
+		void addP2Score(int a);
 
 		bool isRoundCountdown();
 		bool isRoundRunning();

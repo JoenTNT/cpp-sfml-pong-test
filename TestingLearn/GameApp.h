@@ -20,8 +20,7 @@ namespace pong
 		sf::RenderWindow* mainWindow;
 		sf::RectangleShape* background;
 
-		sf::Text scoreText;
-		sf::Font font;
+		sf::CircleShape midLine[20];
 
 		bool isAppRunning = true;
 

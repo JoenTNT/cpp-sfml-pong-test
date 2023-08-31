@@ -25,7 +25,8 @@ namespace pong
 		std::function<void(const OnAddRuntimeEventArgs&)> onAddRuntimeFunc;
 		Subscriber* onAddRuntimeEvSubs = nullptr;
 
-		float moveSpeed = 192.f;
+		float moveSpeed = 257.5f;
+		float coneBackBouncePoint = 60.f;
 
 		sf::Keyboard::Key upKey = sf::Keyboard::Key::W;
 		sf::Keyboard::Key downKey = sf::Keyboard::Key::S;

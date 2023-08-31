@@ -8,10 +8,15 @@ pong::PongBall::PongBall(sf::RenderWindow* window, float ballRadius) : GameObjec
 
 	// Add velocity instance.
 	velocityHandler = new Velocity2D(this);
+
+	// Initialize events.
+	onBallScoreEvCont = std::unordered_multimap<const void*, std::function<void(const Event&)>>();
+	onBallScoreEvInvk = new Invoker(&onBallScoreEvCont);
 }
 
 pong::PongBall::~PongBall()
 {
+	delete onBallScoreEvInvk;
 	delete velocityHandler;
 }
 
@@ -72,8 +77,11 @@ float pong::PongBall::getAccelerate()
 
 void pong::PongBall::setVelocity(sf::Vector2f dir)
 {
-	// Set inner velocity.
-	velocityHandler->setDirection(dir * moveSpeed);
+	// Set initial direction.
+	velocityHandler->setDirection(dir);
+
+	// Set velocity with normalized times speed.
+	velocityHandler->setDirection(velocityHandler->getNormalDir() * moveSpeed);
 }
 
 void pong::PongBall::accelerate()
@@ -96,6 +104,11 @@ void pong::PongBall::bounceY()
 	sf::Vector2f currentVel = velocityHandler->getDirection();
 	currentVel.y = -currentVel.y;
 	velocityHandler->setDirection(currentVel);
+}
+
+pong::Subscriber* pong::PongBall::createOnBallScoreEvSubs()
+{
+	return new Subscriber(&onBallScoreEvCont);
 }
 
 void pong::PongBall::onAwake()
@@ -128,6 +141,14 @@ void pong::PongBall::onUpdate()
 		// Bounce the pong ball.
 		bounceY();
 	}
+
+	// Update changed position and velocity.
+	setPosition(currentPos);
+
+	// Set ball sprite position.
+	shape.setPosition(currentPos);
+
+	// Check scoring event.
 	if (maxBoundPos.x > fWindowSize.x || currentPos.x < 0.f) {
 		//std::cout << "Current X Position = " << currentPos.x << std::endl;
 
@@ -137,18 +158,19 @@ void pong::PongBall::onUpdate()
 
 		/* Realistic bounce */
 		// Get positive value of shifted position.
-		float shiftedValueX = currentPos.x < 0.f ? -currentPos.x : maxBoundPos.x - fWindowSize.x;
-		currentPos.x = currentPos.x < 0.f ? shiftedValueX : fWindowSize.x - shiftedValueX - ballDiameter;
+		//float shiftedValueX = currentPos.x < 0.f ? -currentPos.x : maxBoundPos.x - fWindowSize.x;
+		//currentPos.x = currentPos.x < 0.f ? shiftedValueX : fWindowSize.x - shiftedValueX - ballDiameter;
 
 		// Bounce the pong ball.
-		bounceX();
+		//bounceX();
+
+		// Stop velocity.
+		velocityHandler->setDirection(sf::Vector2f(0.f, 0.f));
+
+		// Score for?
+		OnBallScoreEventArgs arg(currentPos.x < 0.f, maxBoundPos.x > fWindowSize.x);
+		onBallScoreEvInvk->Invoke(arg);
 	}
-
-	// Update changed position and velocity.
-	setPosition(currentPos);
-
-	// Set ball sprite position.
-	shape.setPosition(currentPos);
 
 	// Draw the ball.
 	onWindowDraw(&shape);

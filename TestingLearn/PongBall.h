@@ -11,6 +11,16 @@
 
 namespace pong
 {
+	/// <summary>
+	/// Event argument when the ball score where between 2 side.
+	/// </summary>
+	struct OnBallScoreEventArgs : Event {
+		bool leftGoal = false;
+		bool rightGoal = false;
+
+		OnBallScoreEventArgs(bool left, bool right) : leftGoal(left), rightGoal(right) { }
+	};
+
 	class PongBall final : public GameObject2D, public IRuntime
 	{
 	private:
@@ -19,8 +29,11 @@ namespace pong
 		Velocity2D* velocityHandler;
 		sf::CircleShape shape;
 
-		float moveSpeed = 250.f;
-		float accelerateSpeed = 25.f;
+		std::unordered_multimap<const void*, std::function<void(const Event&)>> onBallScoreEvCont;
+		Invoker* onBallScoreEvInvk;
+
+		float moveSpeed = 225.f;
+		float accelerateSpeed = 8.f;
 
 	public:
 		PongBall(sf::RenderWindow* window, float ballRadius);
@@ -49,6 +62,12 @@ namespace pong
 		/// Bounce function against something on y axis.
 		/// </summary>
 		void bounceY();
+
+		/// <summary>
+		/// This will create a subscriber from the event container.
+		/// </summary>
+		/// <returns></returns>
+		Subscriber* createOnBallScoreEvSubs();
 
 		void onAwake();
 		void onUpdate();

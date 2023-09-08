@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <unordered_map>
+#include <memory>
 
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
@@ -11,16 +12,18 @@
 #include "UIContainer.h"
 #include "Systems/GameSystem.h"
 
+#define LIMIT_MID_LINE_CIRCLE 20
+
 namespace pong
 {
 	class GameApp final : public IRuntime
 	{
 	private: // Variables
-		GameSystem* gameSystem;
+		std::unique_ptr<GameSystem> gameSystem;
 		sf::RenderWindow* mainWindow;
 		sf::RectangleShape* background;
 
-		sf::CircleShape midLine[20];
+		sf::CircleShape midLine[LIMIT_MID_LINE_CIRCLE];
 
 		bool isAppRunning = true;
 

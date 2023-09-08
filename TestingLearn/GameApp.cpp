@@ -14,7 +14,7 @@ pong::GameApp::GameApp()
 	// Create game system as mandatory.
 	sf::Vector2i windowSize = sf::Vector2i(minWindowWidth, minWindowHeight);
 	mainWindow = new sf::RenderWindow(sf::VideoMode(windowSize.x, windowSize.y), "PONG!");
-	gameSystem = new pong::GameSystem(mainWindow);
+	gameSystem = std::make_unique<GameSystem>(GameSystem(mainWindow));
 	mainWindow->setFramerateLimit(60);
 	mainWindow->setVerticalSyncEnabled(true);
 
@@ -27,7 +27,6 @@ pong::GameApp::GameApp()
 pong::GameApp::~GameApp()
 {
 	delete mainWindow;
-	delete gameSystem;
 	delete background;
 }
 
@@ -80,9 +79,6 @@ void pong::GameApp::onAwake()
 	std::cout << "Game is Running..." << std::endl;
 }
 
-sf::Vector2f fWindowSize;
-float ratio;
-
 void pong::GameApp::onUpdate()
 {
 	// Check termination of the app.
@@ -104,6 +100,8 @@ void pong::GameApp::onUpdate()
 
 	// Handle events
 	sf::Event ev;
+	sf::Vector2f fWindowSize;
+	float ratio;
 	while (mainWindow->pollEvent(ev))
 	{
 		// Check event.
